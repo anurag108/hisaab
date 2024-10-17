@@ -1,0 +1,46 @@
+
+==== Create new business
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business -d '{ "name":"<BIZ_NAME>","address":"<BIZ_ADDRESS>"}'
+
+==== Fetch a business
+curl -H 'Content-Type: application/json' -X GET localhost:8080/business/aBfJosYmhg7dsKOQ56lr/
+
+==== Invite Broker
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business/invite_broker -d '{ "brokerEmail":"<BROKER_EMAIL>"}'
+
+==== Create new broker
+curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "name": "<NAME>", "email":"<EMAIL>", "password":"<PASSWORD>", "phoneNumber":"<PHONE>"}'
+
+==== Create new party
+curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "name": "<>", "address":"<>", "pan":"<>", "gstNumber":"<>"}'
+
+==== Get Broker details
+curl -H 'Content-Type: application/json' -X GET localhost:8080/broker/<>/
+
+==== Respond to invitation
+curl -H 'Content-Type: application/json' -X POST localhost:8080/broker/invitation -d '{ "invitationId": "<>", "decision":"<>"}'
+
+==== Fetch POs
+curl -H 'Content-Type: application/json' -X GET localhost:8080/po
+
+==== Create new PO
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po -d '{ "invitationId": "<>", "decision":"<>"}'
+
+
+
+
+curl -H 'Content-Type: application/json' -X POST localhost:8080/ZQO0zqKhEzwuqpE40U1p/po/new -d '{ "broker_id":"<RANDOM_BROKER_ID>","body":"bar", "id": 1}'
+
+
+curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr","name":"Ankit Tomar", "phoneNumber": "+919911123702", "email": "arvindkumarsharadkumar@gmail.com", "password": "Ankit@12"}'
+
+curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr","name":"Anurag Gupta", "phoneNumber": "+918130992702", "email": "anurag.gupta108@gmail.com", "password": "Qwedsa@123"}'
+
+
+curl -H 'Content-Type: application/json' -X POST localhost:8080/party -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr", "brokerId":"CYcXCOHkgAwIr9wwCZG7", "name":"Arvind Gupta", "address": "16 Community Center, Lawrence Road, New Delhi - 110035", "pan": "ASXPG4332J", "gstNumber": "KJNOJA98769HJAKJ"}'
+
+
+curl -H 'Content-Type: application/json' -X POST localhost:8080/purchaseOrder -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr", "brokerId":"CYcXCOHkgAwIr9wwCZG7", "totalQuantity": 800, "rate": 2830, "contractDate": 1727136000000, "deliveryDate": 1727395200000}'
+
+
+curl -H 'Content-Type: application/json' -X POST localhost:8080/purchaseOrderItems -d '{ "purchaseOrderId":"e25BCTUTMulcWfv3y413", "items": [{"vehicleNumber": "HR98 K8780", "quantity": 170, "billNumber": "76967", "partyId": "1j4sBGJbpwavSVxkYE0O"}, {"vehicleNumber": "RJ10 B8768", "quantity": 140, "billNumber": "75676", "partyId": "1j4sBGJbpwavSVxkYE0O"}]}'

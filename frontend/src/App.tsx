@@ -67,8 +67,8 @@ function App() {
               <ListItemText primary="Home" />
             </ListItemButton>
             <ListItemButton
-              selected={selectedTab === 'MANAGE_PARTIES'}
-              onClick={(event) => handleListItemClick(event, 'MANAGE_PARTIES')}>
+              selected={selectedTab === 'MANAGE_PARTY'}
+              onClick={(event) => handleListItemClick(event, 'MANAGE_PARTY')}>
               <ListItemIcon>
                 <GroupIcon />
               </ListItemIcon>
@@ -98,7 +98,6 @@ function App() {
 
         <Box component="main" sx={{ flexGrow: 1, p: 2.5, mt: 6.5 }}>
           {selectedTab === 'HOME' && <OrderCrud />}
-          {/* {selectedTab === 'MANAGE_BROKER' && <BrokerCrud />} */}
           {selectedTab === 'MANAGE_PARTY' && <PartyCrud />}
           {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
         </Box>

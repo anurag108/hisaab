@@ -23,7 +23,7 @@ import {
 import {
     randomId
 } from '@mui/x-data-grid-generator';
-import mockOrders from '../data/orders.json'
+// import mockOrders from '../data/orders.json'
 
 const commonColumnProps = {
     flex: 1
@@ -68,11 +68,13 @@ export default function OrderCrud() {
     const [rows, setRows] = useState(initialRows);
 
     useEffect(() => {
-        const fetchParties = () => {
-            setRows(mockOrders);
+        const fetchParties = async () => {
+            const response = await fetch('http://localhost:8080/po/');
+            const data = await response.json();
+            setRows(data);
         }
         fetchParties();
-    }, [mockOrders]);
+    }, []);
 
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
@@ -230,7 +232,7 @@ export default function OrderCrud() {
     return (
         <Box
             sx={{
-                height: '60%',
+                height: '100%',
                 width: '100%',
                 '& .actions': {
                     color: 'text.secondary',

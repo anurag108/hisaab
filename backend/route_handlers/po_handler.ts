@@ -14,8 +14,7 @@ router.get("/:poId", async (req: Request, res: Response) => {
 });
 
 router.get("/", async (req: Request, res: Response) => {
-    const orders = await getPurchaseOrders(req.body.businessId ?? 'aBfJosYmhg7dsKOQ56lr');
-    console.log("Orders ", orders);
+    const orders = await getPurchaseOrders('aBfJosYmhg7dsKOQ56lr');
     res.send(orders);
 });
 

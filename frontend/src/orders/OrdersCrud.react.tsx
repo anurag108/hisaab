@@ -19,15 +19,15 @@ import {
     GridRowModel,
     GridRowEditStopReasons,
     GridSlots,
+    GridToolbarExport,
+    GridCallbackDetails,
+    GridRowParams,
+    MuiEvent,
 } from '@mui/x-data-grid';
 import {
     randomId
 } from '@mui/x-data-grid-generator';
-// import mockOrders from '../data/orders.json'
-
-const commonColumnProps = {
-    flex: 1
-}
+import { Order } from '../types';
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -40,12 +40,14 @@ function EditToolbar(props: EditToolbarProps) {
     const { setRows, setRowModesModel } = props;
 
     const handleClick = () => {
+        // not saved in FB, just to manage UI changes
         const id = randomId();
         setRows((oldRows) => [
             ...oldRows,
             {
-                id, businessId: '', brokerId: '', totalQuantity: '', rate: '',
-                contractDate: '', delivryDate: '', status: '', isNew: true
+                id, businessId: '', brokerId: '', totalQuantity: 0.0, rate: 0.0,
+                contractDate: '', deliveryDate: '', status: 'PENDING_APPROVAL', creationTime: '', updateTime: '', items: [],
+                isNew: true
             },
         ]);
         setRowModesModel((oldModel) => ({
@@ -59,23 +61,18 @@ function EditToolbar(props: EditToolbarProps) {
             <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleClick}>
                 Add Order
             </Button>
+            <GridToolbarExport />
         </GridToolbarContainer>
     );
 }
 
-export default function OrderCrud() {
-    const initialRows: GridRowsProp = [];
-    const [rows, setRows] = useState(initialRows);
+interface OrdersCrudProps {
+    initialOrders: GridRowsProp,
+    onOrderClick: (order: Order) => Promise<void>
+}
 
-    useEffect(() => {
-        const fetchParties = async () => {
-            const response = await fetch('http://localhost:8080/po/');
-            const data = await response.json();
-            setRows(data);
-        }
-        fetchParties();
-    }, []);
-
+export default function OrdersCrud(props: OrdersCrudProps) {
+    const [orders, setOrders] = useState(props.initialOrders);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -88,12 +85,14 @@ export default function OrderCrud() {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
 
-    const handleSaveClick = (id: GridRowId) => () => {
+    const handleSaveClick = (id: GridRowId) => async () => {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+        // TODO: call add order API
     };
 
-    const handleDeleteClick = (id: GridRowId) => () => {
-        setRows(rows.filter((row) => row.id !== id));
+    const handleDeleteClick = (id: GridRowId) => async () => {
+        // TODO: call delete order API
+        setOrders(orders.filter((order) => order.id !== id));
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
@@ -102,15 +101,15 @@ export default function OrderCrud() {
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
         });
 
-        const editedRow = rows.find((row) => row.id === id);
+        const editedRow = orders.find((order) => order.id === id);
         if (editedRow!.isNew) {
-            setRows(rows.filter((row) => row.id !== id));
+            setOrders(orders.filter((row) => row.id !== id));
         }
     };
 
     const processRowUpdate = (newRow: GridRowModel) => {
         const updatedRow = { ...newRow, isNew: false };
-        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        setOrders(orders.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
     };
 
@@ -118,74 +117,87 @@ export default function OrderCrud() {
         setRowModesModel(newRowModesModel);
     };
 
+    const handleRowClick = async (params: GridRowParams, event: MuiEvent, details: GridCallbackDetails) => {
+        await props.onOrderClick(params.row);
+    };
+
+    const baseColumnOptions = {
+        flex: 1,
+        hideable: true,
+        pinnable: false,
+    }
+
     const columns: GridColDef[] = [
         {
             field: 'id',
             headerName: 'Order ID',
             editable: false,
-            hideable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'businessId',
             headerName: 'Business ID',
             editable: false,
-            hideable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'brokerId',
             headerName: 'Broker ID',
             editable: false,
-            hideable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'totalQuantity',
             headerName: 'Total Quantity',
             type: 'number',
             editable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'rate',
             headerName: 'Rate',
             type: 'number',
             editable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'contractDate',
             headerName: 'Contract Date',
             editable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'deliveryDate',
             headerName: 'Delivery Date',
             editable: true,
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'status',
             headerName: 'Status',
-            editable: true,
+            editable: false,
             type: 'singleSelect',
-            valueOptions: ['ACTIVE', 'INACTIVE'],
-            ...commonColumnProps
+            ...baseColumnOptions
         },
         {
             field: 'creationTime',
             headerName: 'Creation Time',
             editable: false,
             valueGetter: (param) => new Date(parseInt(param)).toLocaleString(),
-            ...commonColumnProps
+            ...baseColumnOptions
+        },
+        {
+            field: 'updateTime',
+            headerName: 'Last Update Time',
+            editable: false,
+            valueGetter: (param) => new Date(parseInt(param)).toLocaleString(),
+            ...baseColumnOptions
         },
         {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
-            ...commonColumnProps,
+            ...baseColumnOptions,
             cellClassName: 'actions',
             getActions: ({ id }) => {
                 const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -243,10 +255,12 @@ export default function OrderCrud() {
             }}
         >
             <DataGrid
-                rows={rows.length > 0 ? rows : []}
+                rows={orders.length > 0 ? orders : []}
                 columns={columns}
                 editMode="row"
+                onRowClick={handleRowClick}
                 disableRowSelectionOnClick
+                disableColumnResize
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
@@ -255,7 +269,7 @@ export default function OrderCrud() {
                     toolbar: EditToolbar as GridSlots['toolbar'],
                 }}
                 slotProps={{
-                    toolbar: { setRows, setRowModesModel },
+                    toolbar: { setOrders, setRowModesModel },
                 }}
             />
         </Box>

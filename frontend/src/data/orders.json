@@ -7,9 +7,45 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": [
+            {
+                "id": "001-001",
+                "partyId": "PARTY-001",
+                "quantity": 35,
+                "vehicleNumber": "DL87 C8797",
+                "gateEntryNumber": "GATE_ENTRY_NUMBER",
+                "billNumber": "BILL_NUMBER",
+                "claim": 0.0,
+                "bardana": 0.0,
+                "cd2": 7.35,
+                "fumigation": 0.0,
+                "commission": 0.0,
+                "otherDeductions": 0.0,
+                "status": "PENDING_APPROVAL",
+                "creationTime": "",
+                "updateTime": ""
+            },
+            {
+                "id": "001-002",
+                "partyId": "PARTY-001",
+                "quantity": 65,
+                "vehicleNumber": "DL87 C8797",
+                "gateEntryNumber": "GATE_ENTRY_NUMBER",
+                "billNumber": "BILL_NUMBER",
+                "claim": 0.0,
+                "bardana": 0.0,
+                "cd2": 13.5,
+                "fumigation": 0.0,
+                "commission": 0.0,
+                "otherDeductions": 0.0,
+                "status": "PENDING_APPROVAL",
+                "creationTime": "",
+                "updateTime": ""
+            }
+        ]
     },
     {
         "id": "002",
@@ -19,9 +55,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "003",
@@ -31,9 +68,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "APPROVED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "004",
@@ -43,9 +81,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "005",
@@ -55,9 +94,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "APPROVED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "006",
@@ -67,9 +107,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "007",
@@ -79,9 +120,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "APPROVED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "008",
@@ -91,9 +133,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "REJECTED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "009",
@@ -103,9 +146,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "010",
@@ -115,9 +159,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "REJECTED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "011",
@@ -127,9 +172,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "012",
@@ -139,9 +185,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "013",
@@ -151,9 +198,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "APPROVED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "014",
@@ -163,9 +211,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "REJECTED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "015",
@@ -175,9 +224,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "016",
@@ -187,9 +237,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "017",
@@ -199,9 +250,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "APPROVED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "018",
@@ -211,9 +263,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "019",
@@ -223,9 +276,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "020",
@@ -235,9 +289,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "021",
@@ -247,9 +302,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "COMPLETED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "022",
@@ -259,9 +315,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "023",
@@ -271,9 +328,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "024",
@@ -283,9 +341,10 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "025",
@@ -295,9 +354,10 @@
         "rate": 10.5,
         "contractDate": "2024-10-15",
         "deliveryDate": "2024-10-20",
-        "status": "Pending",
+        "status": "PENDING_APPROVAL",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     },
     {
         "id": "026",
@@ -307,8 +367,9 @@
         "rate": 9.75,
         "contractDate": "2024-10-16",
         "deliveryDate": "2024-10-22",
-        "status": "Shipped",
+        "status": "APPROVED",
         "creationTime": "1727173876473",
-        "updateTime": "1729173876473"
+        "updateTime": "1729173876473",
+        "items": []
     }
 ]

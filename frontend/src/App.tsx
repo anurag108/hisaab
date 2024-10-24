@@ -17,7 +17,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
 import PartyCrud from './parties/PartyCrud.react';
-import OrderCrud from './orders/OrderCrud.react';
+import OrderManager from './orders/OrderManager.react';
 
 const theme = createTheme();
 const sidebarWidth = 240;
@@ -97,7 +97,7 @@ function App() {
         </Drawer>
 
         <Box component="main" sx={{ flexGrow: 1, p: 2.5, mt: 6.5 }}>
-          {selectedTab === 'HOME' && <OrderCrud />}
+          {selectedTab === 'HOME' && <OrderManager />}
           {selectedTab === 'MANAGE_PARTY' && <PartyCrud />}
           {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
         </Box>

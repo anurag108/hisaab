@@ -1,139 +1,169 @@
-import { Box, Button } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
+import {
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
+} from "@mui/material";
 import {
     DataGrid,
-    GridActionsCellItem,
     GridColDef,
-    GridRowModesModel,
     GridSlots,
     GridToolbarContainer,
-    GridRowModes,
+    GridRowsProp,
+    GridRenderCellParams,
     GridRowId,
-    GridRowModel,
-    GridEventListener,
-    GridRowEditStopReasons,
-    GridRowsProp
 } from "@mui/x-data-grid";
-import { useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
+import { MouseEvent, useState } from "react";
+import InviteTrader from "./InviteTrader.react";
+import mockTraders from '../data/traders.json';
 
 interface InviteToolbarProps {
-    onClickInvite: () => Promise<void>
+    handleInviteDialogClick: () => Promise<void>
 }
 
 function InviteToolbar(props: InviteToolbarProps) {
-    const handleInviteClick = async () => {
-        // not saved in FB, just to manage UI changes
-        await props.onClickInvite();
-    };
-
     return (
         <GridToolbarContainer>
-            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleInviteClick}>
+            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={props.handleInviteDialogClick}>
                 Invite Trader
             </Button>
         </GridToolbarContainer>
     );
 }
 
-interface TradersCrudProps {
-    traders: GridRowsProp,
-    onClickInvite: () => Promise<void>
-}
+interface DeactivationConfirmationModalProps {
+    open: boolean,
+    handleDialogClose: () => void
+    handleDeactivation: (params: any) => Promise<void>
+};
 
-export default function TradersCrud(props: TradersCrudProps) {
-    const { onClickInvite } = props;
-    const [traders, setTraders] = useState(props.traders);
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+function DeactivationConfirmationModal(props: DeactivationConfirmationModalProps) {
+    const { open, handleDialogClose, handleDeactivation } = props;
 
-    const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            event.defaultMuiPrevented = true;
-        }
+    return (
+        <Dialog
+            open={open}
+            keepMounted
+            onClose={handleDialogClose}
+            aria-describedby="alert-dialog-slide-description"
+        >
+            <DialogTitle>{"Confirm Trader Deactivation"}</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    This trader will not be able to submit purchase orders or dispatch plans.
+                    Previous orders will still be visible to you.
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleDialogClose}>Cancel</Button>
+                <Button onClick={handleDeactivation}>Deactivate</Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
+export default function TradersCrud() {
+    const [traders, setTraders] = useState(mockTraders);
+    const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+    const [deactivationRow, setDeactivationRow] = useState<GridRowId | null>(null);
+
+    const handleInviteDialogClose = () => {
+        setInviteDialogOpen(false);
     };
 
-    const handleEditClick = (id: GridRowId) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    const handleInviteDialogClick = () => {
+        setInviteDialogOpen(true);
     };
 
-    const handleSaveClick = (id: GridRowId) => async () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-        // TODO: call update Trader API
-    };
+    const handleSuccessfulInvite = (id: string, email: string, creationTime: string, updateTime: string) => {
+        const invitedTrader = {
+            id,
+            name: '',
+            email,
+            phoneNumber: '',
+            status: 'INVITED',
+            creationTime,
+            updateTime,
+            parties: []
+        };
+        setTraders(traders.concat(invitedTrader));
+    }
 
-    const handleCancelClick = (id: GridRowId) => () => {
-        setRowModesModel({
-            ...rowModesModel,
-            [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    const handleDeactivation = async () => {
+        // TODO: call deactivation API
+        const updatedTraders = traders.map((trader) => {
+            if (trader.id === deactivationRow) {
+                trader.status = 'DEACTIVATED';
+            }
+            return trader;
         });
-
-        // const editedRow = traders.find((trader) => trader.id === id);
-        // if (editedRow!.isNew) {
-        //     setTraders(traders.filter((trader) => trader.id !== id));
-        // }
-    };
-
-    const processRowUpdate = (newRow: GridRowModel) => {
-        const updatedRow = { ...newRow, isNew: false };
-        setTraders(traders.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        return updatedRow;
-    };
-
-    const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-        setRowModesModel(newRowModesModel);
-    };
+        setTraders(updatedTraders);
+        setDeactivationRow(null);
+    }
 
     const baseColumnOptions = {
-        flex: 1,
-        hideable: true,
+        hideable: false,
         pinnable: false,
+        editable: false,
     }
 
     const columns: GridColDef[] = [
         {
             field: 'id',
             headerName: 'Trader ID',
-            editable: false,
             ...baseColumnOptions
         },
         {
             field: 'name',
             headerName: 'Name',
-            editable: false,
+            flex: 2,
             ...baseColumnOptions
         },
         {
             field: 'email',
             headerName: 'Email',
-            editable: false,
+            flex: 2.5,
             ...baseColumnOptions
         },
         {
             field: 'phoneNumber',
             headerName: 'Phone Number',
             type: 'number',
-            editable: false,
+            headerAlign: 'left',
+            align: 'left',
+            flex: 1.5,
             ...baseColumnOptions
         },
         {
             field: 'status',
             headerName: 'Status',
-            editable: false,
-            ...baseColumnOptions
+            flex: 1.5,
+            ...baseColumnOptions,
+            renderCell: (params: GridRenderCellParams) => {
+                if (params.value === 'DEACTIVATED') {
+                    return (<Chip label={params.value} color='error' />);
+                } else if (params.value === 'INVITED') {
+                    return (<Chip label={params.value} color='warning' />);
+                }
+                return (<Chip label={params.value} color='success' />);
+            }
         },
         {
             field: 'creationTime',
             headerName: 'Creation Time',
-            editable: false,
+            flex: 2,
             valueGetter: (param: string) => new Date(parseInt(param)).toLocaleString(),
             ...baseColumnOptions
         },
         {
             field: 'updateTime',
             headerName: 'Last Update Time',
-            editable: false,
+            flex: 2,
             valueGetter: (param: string) => new Date(parseInt(param)).toLocaleString(),
             ...baseColumnOptions
         },
@@ -141,74 +171,67 @@ export default function TradersCrud(props: TradersCrudProps) {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
+            flex: 2,
             ...baseColumnOptions,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+            renderCell: (params: GridRenderCellParams) => {
+                const onDeactivateClick = (event: MouseEvent<HTMLElement>) => {
+                    event.stopPropagation();
+                    setDeactivationRow(params.id);
+                };
+                const onReactivateClick = (event: MouseEvent<HTMLElement>) => {
+                    // TODO: call reactivate api
+                    const updatedTraders = traders.map((trader) => {
+                        if (trader.id === params.id) {
+                            trader.status = 'ACTIVE';
+                        }
+                        return trader;
+                    });
+                    setTraders(updatedTraders);
+                };
 
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
+                const onCancelInviteClick = async () => {
+                    // TODO: Call API
+                    console.log("Cancelling invite");
+                    const updatedTraders = traders.filter((trader) => trader.id !== params.id);
+                    setTraders(updatedTraders);
+                };
+
+                const status = params.row.status;
+                if (status === 'DEACTIVATED') {
+                    return (<Button variant="contained" color="primary" onClick={onReactivateClick}>Reactivate Trader</Button>);
+                } else if (status === 'INVITED') {
+                    return (<Button variant="contained" color="primary" onClick={onCancelInviteClick}>Cancel Invite</Button>);
                 }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />
-                ];
+                else {
+                    return (<Button variant="contained" color="error" onClick={onDeactivateClick}>Deactivate Trader</Button>);
+                }
             },
         },
     ];
 
     return (
-        <Box
-            sx={{
-                height: '100%',
-                width: '100%',
-                '& .actions': {
-                    color: 'text.secondary',
-                },
-                '& .textPrimary': {
-                    color: 'text.primary',
-                },
-            }}
-        >
+        <Box sx={{ height: '100%', width: '100%' }}>
             <DataGrid
                 rows={traders.length > 0 ? traders : []}
                 columns={columns}
-                editMode="row"
+                columnVisibilityModel={{
+                    id: false,
+                }}
+                disableColumnMenu
                 disableRowSelectionOnClick
                 disableColumnResize
-                rowModesModel={rowModesModel}
-                onRowModesModelChange={handleRowModesModelChange}
-                onRowEditStop={handleRowEditStop}
-                processRowUpdate={processRowUpdate}
                 slots={{
                     toolbar: InviteToolbar as GridSlots['toolbar'],
                 }}
                 slotProps={{
-                    toolbar: { onClickInvite },
+                    toolbar: { handleInviteDialogClick },
                 }}
             />
+            <InviteTrader open={inviteDialogOpen} handleDialogClose={handleInviteDialogClose} handleSuccessfulInvite={handleSuccessfulInvite} />
+            <DeactivationConfirmationModal
+                open={deactivationRow !== null}
+                handleDialogClose={() => setDeactivationRow(null)}
+                handleDeactivation={handleDeactivation} />
         </Box>
     );
 }

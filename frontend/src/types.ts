@@ -45,3 +45,24 @@ export interface OrderItem {
     // status: OrderItemStatus,
     status: string,
 }
+
+export interface Trader {
+    id: string,
+    name: string,
+    email: string,
+    phoneNumber: string,
+    status: string,
+    creationTime: string,
+    updateTime: string,
+    parties: Party[],
+}
+
+export interface Party {
+    id: string,
+    name: string,
+    gstNumber: string,
+    pan: string,
+    status: string,
+    creationTime: string,
+    updateTime: string,
+}

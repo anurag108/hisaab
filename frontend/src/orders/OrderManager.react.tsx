@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import mockOrders from '../data/orders.json'
 import OrderDetails from "./OrderDetails.react";
 import OrdersCrud from "./OrdersCrud.react";
@@ -9,7 +9,6 @@ export default function OrderManager() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     const handleOrderClick = async (order: Order) => {
-        console.log("Clicked on order", order);
         setSelectedOrder(order);
     };
 
@@ -17,7 +16,7 @@ export default function OrderManager() {
         setSelectedOrder(null);
     }
 
-    return (<div>
+    return (<Box>
         {selectedOrder === null && <OrdersCrud initialOrders={mockOrders} onOrderClick={handleOrderClick} />}
         {selectedOrder !== null &&
             <Box>
@@ -26,5 +25,5 @@ export default function OrderManager() {
                     <OrderDetails order={selectedOrder} />
                 </Box>
             </Box>}
-    </div>);
+    </Box>);
 }

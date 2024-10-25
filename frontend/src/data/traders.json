@@ -1,0 +1,40 @@
+[
+    {
+        "id": "TRD-001",
+        "name": "Arvind Kumar Shard Kumar",
+        "email": "arvindkumarsharadkumar@gmail.com",
+        "phoneNumber": "9818152206",
+        "status": "ACTIVE",
+        "creationTime": "1727173876473",
+        "updateTime": "1727173876473",
+        "parties": [
+            {
+                "id": "Party-001",
+                "name": "Ankit Tomar",
+                "gstNumber": "897230870238742",
+                "pan": "ASXPF4332J",
+                "status": "ACTIVE",
+                "creationTime": "1727173876473",
+                "updateTime": "1727173876473"
+            },
+            {
+                "id": "Party-002",
+                "name": "Anurag Gupta",
+                "gstNumber": "07829387423",
+                "pan": "ASKJY4332J",
+                "status": "ACTIVE",
+                "creationTime": "1727173876473",
+                "updateTime": "1727173876473"
+            },
+            {
+                "id": "Party-003",
+                "name": "Arvind Gupta",
+                "gstNumber": "897230870238742",
+                "pan": "PUJAJ4332J",
+                "status": "ACTIVE",
+                "creationTime": "1727173876473",
+                "updateTime": "1727173876473"
+            }
+        ]
+    }
+]

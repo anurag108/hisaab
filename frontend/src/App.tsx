@@ -18,6 +18,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
 import PartyCrud from './parties/PartyCrud.react';
 import OrderManager from './orders/OrderManager.react';
+import TraderManager from './trader/TraderManager.react';
 
 const theme = createTheme();
 const sidebarWidth = 240;
@@ -67,12 +68,12 @@ function App() {
               <ListItemText primary="Home" />
             </ListItemButton>
             <ListItemButton
-              selected={selectedTab === 'MANAGE_PARTY'}
-              onClick={(event) => handleListItemClick(event, 'MANAGE_PARTY')}>
+              selected={selectedTab === 'MANAGE_TRADERS'}
+              onClick={(event) => handleListItemClick(event, 'MANAGE_TRADERS')}>
               <ListItemIcon>
                 <GroupIcon />
               </ListItemIcon>
-              <ListItemText primary="Manage Parties" />
+              <ListItemText primary="Manage Traders" />
             </ListItemButton>
             <ListItemButton
               selected={selectedTab === 'MANAGE_ACCOUNT'}
@@ -98,7 +99,7 @@ function App() {
 
         <Box component="main" sx={{ flexGrow: 1, p: 2.5, mt: 6.5 }}>
           {selectedTab === 'HOME' && <OrderManager />}
-          {selectedTab === 'MANAGE_PARTY' && <PartyCrud />}
+          {selectedTab === 'MANAGE_TRADERS' && <TraderManager />}
           {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
         </Box>
       </Box>

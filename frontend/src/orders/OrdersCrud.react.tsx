@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import {
@@ -23,11 +20,13 @@ import {
     GridCallbackDetails,
     GridRowParams,
     MuiEvent,
+    GridRenderCellParams,
 } from '@mui/x-data-grid';
 import {
     randomId
 } from '@mui/x-data-grid-generator';
 import { Order } from '../types';
+import { Button, Chip, Divider } from '@mui/material';
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -45,7 +44,7 @@ function EditToolbar(props: EditToolbarProps) {
         setRows((oldRows) => [
             ...oldRows,
             {
-                id, businessId: '', brokerId: '', totalQuantity: 0.0, rate: 0.0,
+                id, businessId: '', traderId: '', totalQuantity: 0.0, rate: 0.0,
                 contractDate: '', deliveryDate: '', status: 'PENDING_APPROVAL', creationTime: '', updateTime: '', items: [],
                 isNew: true
             },
@@ -58,10 +57,13 @@ function EditToolbar(props: EditToolbarProps) {
 
     return (
         <GridToolbarContainer>
-            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+            {/* <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleClick}>
                 Add Order
-            </Button>
-            <GridToolbarExport />
+            </Button> */}
+            <GridToolbarExport slotProps={{
+                tooltip: { title: 'Export purchase orders' },
+                button: { variant: 'contained' }
+            }} />
         </GridToolbarContainer>
     );
 }
@@ -121,75 +123,111 @@ export default function OrdersCrud(props: OrdersCrudProps) {
         await props.onOrderClick(params.row);
     };
 
+    const getActionsPerStatus = (status: string) => {
+        const approveAction = (
+            <Button variant="contained" color="primary" onClick={() => { }}>Approve</Button>
+        );
+        const rejectAction = (
+            <Button variant="contained" color="error" onClick={() => { }}>Reject</Button>
+        );
+        const editAction = (
+            <Button variant="contained" color="warning" onClick={() => { }}>Edit</Button>
+        );
+        switch (status) {
+            case 'PENDING_APPROVAL':
+                return <Box>{approveAction} {rejectAction}</Box>;
+            case 'APPROVED':
+                return rejectAction;
+            case 'REJECTED':
+                return approveAction;
+            case 'IN_PROGRESS':
+                return editAction;
+            case 'COMPLETED':
+                return [];
+        }
+    };
+
     const baseColumnOptions = {
         flex: 1,
         hideable: true,
         pinnable: false,
+        editable: false,
     }
 
     const columns: GridColDef[] = [
         {
             field: 'id',
             headerName: 'Order ID',
-            editable: false,
             ...baseColumnOptions
         },
         {
             field: 'businessId',
             headerName: 'Business ID',
-            editable: false,
             ...baseColumnOptions
         },
         {
-            field: 'brokerId',
-            headerName: 'Broker ID',
-            editable: false,
+            field: 'traderId',
+            headerName: 'Trader ID',
             ...baseColumnOptions
         },
         {
             field: 'totalQuantity',
-            headerName: 'Total Quantity',
+            headerName: 'Total Quantity (Qntl)',
             type: 'number',
-            editable: true,
+            headerAlign: 'left',
+            align: 'left',
             ...baseColumnOptions
         },
         {
             field: 'rate',
-            headerName: 'Rate',
+            headerName: 'Rate (₹)',
             type: 'number',
-            editable: true,
+            headerAlign: 'left',
+            align: 'left',
             ...baseColumnOptions
         },
         {
             field: 'contractDate',
             headerName: 'Contract Date',
-            editable: true,
             ...baseColumnOptions
         },
         {
             field: 'deliveryDate',
             headerName: 'Delivery Date',
-            editable: true,
             ...baseColumnOptions
         },
         {
             field: 'status',
             headerName: 'Status',
-            editable: false,
             type: 'singleSelect',
-            ...baseColumnOptions
+            valueOptions: ['PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'IN_PROGRESS', 'COMPLETED'],
+            ...baseColumnOptions,
+            renderCell: (params: GridRenderCellParams) => {
+                switch (params.value) {
+                    case 'PENDING_APPROVAL':
+                        return (<Chip label={params.value} color='secondary' />);
+                    case 'APPROVED':
+                        return (<Chip label={params.value} color='primary' />);
+                    case 'REJECTED':
+                        return (<Chip label={params.value} color='error' />);
+                    case 'IN_PROGRESS':
+                        return (<Chip label={params.value} color='warning' />);
+                    case 'COMPLETED':
+                        return (<Chip label={params.value} color='success' />);
+                    default:
+                        throw new Error('Unexpected purchase order status');
+                }
+            }
         },
         {
             field: 'creationTime',
             headerName: 'Creation Time',
-            editable: false,
             valueGetter: (param) => new Date(parseInt(param)).toLocaleString(),
             ...baseColumnOptions
         },
         {
             field: 'updateTime',
             headerName: 'Last Update Time',
-            editable: false,
             valueGetter: (param) => new Date(parseInt(param)).toLocaleString(),
             ...baseColumnOptions
         },
@@ -199,8 +237,13 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             headerName: 'Actions',
             ...baseColumnOptions,
             cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+            renderCell: (params: GridRenderCellParams) => {
+                const actions = getActionsPerStatus(params.row.status);
+                return actions;
+            },
+            getActions: (params: GridRowParams) => {
+                const rowId = params.id;
+                const isInEditMode = rowModesModel[rowId]?.mode === GridRowModes.Edit;
 
                 if (isInEditMode) {
                     return [
@@ -210,57 +253,40 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                             sx={{
                                 color: 'primary.main',
                             }}
-                            onClick={handleSaveClick(id)}
+                            onClick={handleSaveClick(rowId)}
                         />,
                         <GridActionsCellItem
                             icon={<CancelIcon />}
                             label="Cancel"
                             className="textPrimary"
-                            onClick={handleCancelClick(id)}
+                            onClick={handleCancelClick(rowId)}
                             color="inherit"
                         />,
                     ];
                 }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={handleDeleteClick(id)}
-                        color="inherit"
-                    />,
-                ];
+                return [];
             },
         },
     ];
 
     return (
-        <Box
-            sx={{
-                height: '100%',
-                width: '100%',
-                '& .actions': {
-                    color: 'text.secondary',
-                },
-                '& .textPrimary': {
-                    color: 'text.primary',
-                },
-            }}
-        >
+        <Box sx={{ height: '100%', width: '100%' }}>
             <DataGrid
                 rows={orders.length > 0 ? orders : []}
                 columns={columns}
+                columnVisibilityModel={{
+                    id: false,
+                    businessId: false,
+                    creationTime: false,
+                    updateTime: false,
+                }}
                 editMode="row"
-                onRowClick={handleRowClick}
+                // onRowClick={handleRowClick}
+                showCellVerticalBorder
+                showColumnVerticalBorder
                 disableRowSelectionOnClick
                 disableColumnResize
+                disableColumnMenu
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
@@ -272,6 +298,6 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                     toolbar: { setOrders, setRowModesModel },
                 }}
             />
-        </Box>
+        </Box >
     );
 }

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import GroupIcon from '@mui/icons-material/Group';
+import ViewListIcon from '@mui/icons-material/ViewList';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
@@ -67,6 +68,14 @@ function App() {
               <ListItemText primary="Home" />
             </ListItemButton>
             <ListItemButton
+              selected={selectedTab === 'MANAGE_ORDERS'}
+              onClick={(event) => handleListItemClick(event, 'MANAGE_ORDERS')}>
+              <ListItemIcon>
+                <ViewListIcon />
+              </ListItemIcon>
+              <ListItemText primary="Manage Purchase Orders" />
+            </ListItemButton>
+            <ListItemButton
               selected={selectedTab === 'MANAGE_TRADERS'}
               onClick={(event) => handleListItemClick(event, 'MANAGE_TRADERS')}>
               <ListItemIcon>
@@ -89,7 +98,7 @@ function App() {
               selected={selectedTab === 'LOGOUT'}
               onClick={(event) => handleListItemClick(event, 'LOGOUT')}>
               <ListItemIcon>
-                <ExitToAppIcon />
+                <ExitToAppIcon color="error" />
               </ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItemButton>
@@ -98,6 +107,7 @@ function App() {
 
         <Box component="main" sx={{ flexGrow: 1, p: 2.5, mt: 6.5 }}>
           {selectedTab === 'HOME' && <OrderManager />}
+          {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
           {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
           {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
         </Box>

@@ -2,7 +2,7 @@
     {
         "id": "001",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -50,7 +50,7 @@
     {
         "id": "002",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -63,7 +63,7 @@
     {
         "id": "003",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -76,7 +76,7 @@
     {
         "id": "004",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -89,7 +89,7 @@
     {
         "id": "005",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -102,7 +102,7 @@
     {
         "id": "006",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -115,7 +115,7 @@
     {
         "id": "007",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -128,7 +128,7 @@
     {
         "id": "008",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -141,7 +141,7 @@
     {
         "id": "009",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -154,7 +154,7 @@
     {
         "id": "010",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -167,7 +167,7 @@
     {
         "id": "011",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -180,7 +180,7 @@
     {
         "id": "012",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -193,7 +193,7 @@
     {
         "id": "013",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -206,7 +206,7 @@
     {
         "id": "014",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -219,7 +219,7 @@
     {
         "id": "015",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -232,7 +232,7 @@
     {
         "id": "016",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -245,7 +245,7 @@
     {
         "id": "017",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -258,7 +258,7 @@
     {
         "id": "018",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -271,7 +271,7 @@
     {
         "id": "019",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -284,7 +284,7 @@
     {
         "id": "020",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -297,7 +297,7 @@
     {
         "id": "021",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -310,7 +310,7 @@
     {
         "id": "022",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -323,7 +323,7 @@
     {
         "id": "023",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -336,7 +336,7 @@
     {
         "id": "024",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",
@@ -349,7 +349,7 @@
     {
         "id": "025",
         "businessId": "BUS001",
-        "brokerId": "BRK001",
+        "traderId": "BRK001",
         "totalQuantity": 100,
         "rate": 10.5,
         "contractDate": "2024-10-15",
@@ -362,7 +362,7 @@
     {
         "id": "026",
         "businessId": "BUS002",
-        "brokerId": "BRK002",
+        "traderId": "BRK002",
         "totalQuantity": 200,
         "rate": 9.75,
         "contractDate": "2024-10-16",

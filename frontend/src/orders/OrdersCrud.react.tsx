@@ -2,37 +2,41 @@ import { useState } from 'react';
 import Box from '@mui/material/Box';
 import {
     GridRowsProp,
-    GridRowModesModel,
     DataGrid,
     GridColDef,
     GridToolbarContainer,
     GridActionsCellItem,
-    GridSlots,
     GridToolbarExport,
-    GridCallbackDetails,
     GridRowParams,
-    MuiEvent,
     GridRenderCellParams,
+    GridToolbarQuickFilter,
+    GridToolbarFilterButton,
 } from '@mui/x-data-grid';
 import { Order } from '../types';
-import { Chip } from '@mui/material';
+import { Chip, Grid2 } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (
-        newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
-    ) => void;
-}
-
-function EditToolbar(props: EditToolbarProps) {
+function DataToolbar() {
     return (
         <GridToolbarContainer>
-            <GridToolbarExport slotProps={{
-                tooltip: { title: 'Export purchase orders' },
-                button: { variant: 'contained' }
-            }} />
+            <Grid2 container width={'100%'}>
+                <Grid2 size={1}>
+                    <GridToolbarFilterButton slotProps={{
+                        tooltip: { title: 'Filter purchase orders' },
+                        button: { variant: 'contained', size: 'medium' }
+                    }} />
+                </Grid2>
+                <Grid2 size={'grow'}>
+                    <GridToolbarQuickFilter />
+                </Grid2>
+                <Grid2 size={1}>
+                    <GridToolbarExport slotProps={{
+                        tooltip: { title: 'Export purchase orders' },
+                        button: { variant: 'contained', size: 'medium' }
+                    }} />
+                </Grid2>
+            </Grid2>
         </GridToolbarContainer>
     );
 }
@@ -42,14 +46,10 @@ interface OrdersCrudProps {
     onOrderClick: (order: Order) => Promise<void>
 }
 
+const VISIBLE_COLUMNS = ['traderId', 'totalQuantity', 'rate', 'contractDate', 'deliveryDate', 'status'];
+
 export default function OrdersCrud(props: OrdersCrudProps) {
     const [orders, setOrders] = useState(props.initialOrders);
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-
-    const handleRowClick = async (params: GridRowParams, event: MuiEvent, details: GridCallbackDetails) => {
-        await props.onOrderClick(params.row);
-    };
-
     const baseColumnOptions = {
         hideable: true,
         pinnable: false,
@@ -60,12 +60,14 @@ export default function OrdersCrud(props: OrdersCrudProps) {
         {
             field: 'id',
             headerName: 'Order ID',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            filterable: false,
         },
         {
             field: 'businessId',
             headerName: 'Business ID',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            filterable: false,
         },
         {
             field: 'traderId',
@@ -131,13 +133,15 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             field: 'creationTime',
             headerName: 'Creation Time',
             valueGetter: (param) => new Date(parseInt(param)).toLocaleString(),
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            filterable: false,
         },
         {
             field: 'updateTime',
             headerName: 'Last Update Time',
             valueGetter: (param) => new Date(parseInt(param)).toLocaleString(),
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            filterable: false,
         },
         {
             field: 'actions',
@@ -228,19 +232,24 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                     creationTime: false,
                     updateTime: false,
                 }}
+                initialState={{
+                    filter: {
+                        filterModel: {
+                            items: [],
+                            quickFilterExcludeHiddenColumns: true,
+                        },
+                    },
+                }}
+
                 editMode="row"
-                // onRowClick={handleRowClick}
                 showCellVerticalBorder
                 showColumnVerticalBorder
                 disableRowSelectionOnClick
                 disableColumnResize
                 disableColumnMenu
-                rowModesModel={rowModesModel}
+                disableColumnSelector
                 slots={{
-                    toolbar: EditToolbar as GridSlots['toolbar'],
-                }}
-                slotProps={{
-                    toolbar: { setOrders, setRowModesModel },
+                    toolbar: DataToolbar,
                 }}
             />
         </Box >

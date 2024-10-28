@@ -1,20 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
 import {
     GridRowsProp,
     GridRowModesModel,
-    GridRowModes,
     DataGrid,
     GridColDef,
     GridToolbarContainer,
     GridActionsCellItem,
-    GridEventListener,
-    GridRowId,
-    GridRowModel,
-    GridRowEditStopReasons,
     GridSlots,
     GridToolbarExport,
     GridCallbackDetails,
@@ -22,11 +14,10 @@ import {
     MuiEvent,
     GridRenderCellParams,
 } from '@mui/x-data-grid';
-import {
-    randomId
-} from '@mui/x-data-grid-generator';
 import { Order } from '../types';
-import { Button, Chip, Divider } from '@mui/material';
+import { Chip } from '@mui/material';
+import DoneIcon from '@mui/icons-material/Done';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface EditToolbarProps {
     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -36,30 +27,8 @@ interface EditToolbarProps {
 }
 
 function EditToolbar(props: EditToolbarProps) {
-    const { setRows, setRowModesModel } = props;
-
-    const handleClick = () => {
-        // not saved in FB, just to manage UI changes
-        const id = randomId();
-        setRows((oldRows) => [
-            ...oldRows,
-            {
-                id, businessId: '', traderId: '', totalQuantity: 0.0, rate: 0.0,
-                contractDate: '', deliveryDate: '', status: 'PENDING_APPROVAL', creationTime: '', updateTime: '', items: [],
-                isNew: true
-            },
-        ]);
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'businessId' },
-        }));
-    };
-
     return (
         <GridToolbarContainer>
-            {/* <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                Add Order
-            </Button> */}
             <GridToolbarExport slotProps={{
                 tooltip: { title: 'Export purchase orders' },
                 button: { variant: 'contained' }
@@ -77,78 +46,11 @@ export default function OrdersCrud(props: OrdersCrudProps) {
     const [orders, setOrders] = useState(props.initialOrders);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
-    const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            event.defaultMuiPrevented = true;
-        }
-    };
-
-    const handleEditClick = (id: GridRowId) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-    };
-
-    const handleSaveClick = (id: GridRowId) => async () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-        // TODO: call add order API
-    };
-
-    const handleDeleteClick = (id: GridRowId) => async () => {
-        // TODO: call delete order API
-        setOrders(orders.filter((order) => order.id !== id));
-    };
-
-    const handleCancelClick = (id: GridRowId) => () => {
-        setRowModesModel({
-            ...rowModesModel,
-            [id]: { mode: GridRowModes.View, ignoreModifications: true },
-        });
-
-        const editedRow = orders.find((order) => order.id === id);
-        if (editedRow!.isNew) {
-            setOrders(orders.filter((row) => row.id !== id));
-        }
-    };
-
-    const processRowUpdate = (newRow: GridRowModel) => {
-        const updatedRow = { ...newRow, isNew: false };
-        setOrders(orders.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        return updatedRow;
-    };
-
-    const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-        setRowModesModel(newRowModesModel);
-    };
-
     const handleRowClick = async (params: GridRowParams, event: MuiEvent, details: GridCallbackDetails) => {
         await props.onOrderClick(params.row);
     };
 
-    const getActionsPerStatus = (status: string) => {
-        const approveAction = (
-            <Button variant="contained" color="primary" onClick={() => { }}>Approve</Button>
-        );
-        const rejectAction = (
-            <Button variant="contained" color="error" onClick={() => { }}>Reject</Button>
-        );
-        const editAction = (
-            <Button variant="contained" color="warning" onClick={() => { }}>Edit</Button>
-        );
-        switch (status) {
-            case 'PENDING_APPROVAL':
-                return <Box>{approveAction} {rejectAction}</Box>;
-            case 'APPROVED':
-                return rejectAction;
-            case 'REJECTED':
-                return approveAction;
-            case 'IN_PROGRESS':
-                return editAction;
-            case 'COMPLETED':
-                return [];
-        }
-    };
-
     const baseColumnOptions = {
-        flex: 1,
         hideable: true,
         pinnable: false,
         editable: false,
@@ -168,7 +70,8 @@ export default function OrdersCrud(props: OrdersCrudProps) {
         {
             field: 'traderId',
             headerName: 'Trader ID',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            flex: 1,
         },
         {
             field: 'totalQuantity',
@@ -176,7 +79,8 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             type: 'number',
             headerAlign: 'left',
             align: 'left',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            flex: 0.6,
         },
         {
             field: 'rate',
@@ -184,17 +88,20 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             type: 'number',
             headerAlign: 'left',
             align: 'left',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            flex: 0.4,
         },
         {
             field: 'contractDate',
             headerName: 'Contract Date',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            flex: 0.7,
         },
         {
             field: 'deliveryDate',
             headerName: 'Delivery Date',
-            ...baseColumnOptions
+            ...baseColumnOptions,
+            flex: 0.7,
         },
         {
             field: 'status',
@@ -202,6 +109,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             type: 'singleSelect',
             valueOptions: ['PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'IN_PROGRESS', 'COMPLETED'],
             ...baseColumnOptions,
+            flex: 0.7,
             renderCell: (params: GridRenderCellParams) => {
                 switch (params.value) {
                     case 'PENDING_APPROVAL':
@@ -237,35 +145,75 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             headerName: 'Actions',
             ...baseColumnOptions,
             cellClassName: 'actions',
-            renderCell: (params: GridRenderCellParams) => {
-                const actions = getActionsPerStatus(params.row.status);
-                return actions;
-            },
+            flex: 0.2,
             getActions: (params: GridRowParams) => {
-                const rowId = params.id;
-                const isInEditMode = rowModesModel[rowId]?.mode === GridRowModes.Edit;
+                const approveAction = (
+                    <GridActionsCellItem
+                        label='Approve'
+                        icon={<DoneIcon />}
+                        onClick={async () => {
+                            // TODO: Call API
+                            // set status & update view
+                            const updatedOrders = orders.map((order) => {
+                                if (order.id === params.row.id) {
+                                    order.status = 'APPROVED';
+                                }
+                                return order;
+                            })
+                            setOrders(updatedOrders);
+                        }}
+                        showInMenu />
+                );
 
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(rowId)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(rowId)}
-                            color="inherit"
-                        />,
-                    ];
+                const rejectAction = (
+                    <GridActionsCellItem
+                        label='Reject'
+                        icon={<CancelIcon />}
+                        onClick={async () => {
+                            // TODO: Call API
+                            // set status & update view
+                            const updatedOrders = orders.map((order) => {
+                                if (order.id === params.row.id) {
+                                    order.status = 'REJECTED';
+                                }
+                                return order;
+                            })
+                            setOrders(updatedOrders);
+                        }}
+                        showInMenu />
+                );
+
+                const completeAction = (
+                    <GridActionsCellItem
+                        label='Completed'
+                        icon={<CancelIcon />}
+                        onClick={async () => {
+                            // TODO: Call API
+                            // set status & update view
+                            const updatedOrders = orders.map((order) => {
+                                if (order.id === params.row.id) {
+                                    order.status = 'COMPLETED';
+                                }
+                                return order;
+                            })
+                            setOrders(updatedOrders);
+                        }}
+                        showInMenu />
+                );
+
+                switch (params.row.status) {
+                    case 'PENDING_APPROVAL':
+                        return [approveAction, rejectAction];
+                    case 'APPROVED':
+                        return [rejectAction, completeAction];
+                    case 'REJECTED':
+                        return [approveAction];
+                    case 'IN_PROGRESS':
+                        return [completeAction];
+                    default:
+                        return [];
                 }
-                return [];
-            },
+            }
         },
     ];
 
@@ -288,9 +236,6 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                 disableColumnResize
                 disableColumnMenu
                 rowModesModel={rowModesModel}
-                onRowModesModelChange={handleRowModesModelChange}
-                onRowEditStop={handleRowEditStop}
-                processRowUpdate={processRowUpdate}
                 slots={{
                     toolbar: EditToolbar as GridSlots['toolbar'],
                 }}

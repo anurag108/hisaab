@@ -21,7 +21,7 @@ import OrderManager from './orders/OrderManager.react';
 import TradersCrud from './trader/TradersCrud.react';
 
 const theme = createTheme();
-const sidebarWidth = 240;
+const sidebarWidth = 180;
 
 function App() {
   const [selectedTab, setSelectedTab] = useState('HOME');
@@ -35,8 +35,7 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex' }}>
-
+      <Box component="main" sx={{ mt: 9, mr: 1, ml: 23, mb: 1 }}>
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Toolbar>
             <Typography variant="h4" component="div" sx={{ flexGrow: 1, textAlign: 'start' }}>
@@ -73,7 +72,7 @@ function App() {
               <ListItemIcon>
                 <ViewListIcon />
               </ListItemIcon>
-              <ListItemText primary="Manage Purchase Orders" />
+              <ListItemText primary="Purchase Orders" />
             </ListItemButton>
             <ListItemButton
               selected={selectedTab === 'MANAGE_TRADERS'}
@@ -81,7 +80,7 @@ function App() {
               <ListItemIcon>
                 <GroupIcon />
               </ListItemIcon>
-              <ListItemText primary="Manage Traders" />
+              <ListItemText primary="Traders" />
             </ListItemButton>
             <ListItemButton
               selected={selectedTab === 'MANAGE_ACCOUNT'}
@@ -89,7 +88,7 @@ function App() {
               <ListItemIcon>
                 <AccountCircleIcon />
               </ListItemIcon>
-              <ListItemText primary="My Account" />
+              <ListItemText primary="Account" />
             </ListItemButton>
           </List>
           <Divider />
@@ -105,7 +104,7 @@ function App() {
           </List>
         </Drawer>
 
-        <Box component="main" sx={{ flexGrow: 1, p: 2.5, mt: 6.5 }}>
+        <Box>
           {selectedTab === 'HOME' && <OrderManager />}
           {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
           {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}

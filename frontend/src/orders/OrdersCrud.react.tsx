@@ -19,7 +19,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 function DataToolbar() {
     return (
-        <GridToolbarContainer>
+        <GridToolbarContainer sx={{ mb: 2 }}>
             <Grid2 container width={'100%'}>
                 <Grid2 size={1}>
                     <GridToolbarFilterButton slotProps={{
@@ -149,7 +149,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             headerName: 'Actions',
             ...baseColumnOptions,
             cellClassName: 'actions',
-            flex: 0.2,
+            flex: 0.3,
             getActions: (params: GridRowParams) => {
                 const approveAction = (
                     <GridActionsCellItem
@@ -224,6 +224,21 @@ export default function OrdersCrud(props: OrdersCrudProps) {
     return (
         <Box sx={{ height: '100%', width: '100%' }}>
             <DataGrid
+                sx={{
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                        whiteSpace: "normal",
+                        lineHeight: "normal",
+                        fontWeight: "bold",
+                    },
+                    "& .MuiDataGrid-columnHeader": {
+                        // Forced to use important since overriding inline styles
+                        height: "unset !important"
+                    },
+                    "& .MuiDataGrid-columnHeaders": {
+                        // Forced to use important since overriding inline styles
+                        maxHeight: "168px !important"
+                    }
+                }}
                 rows={orders.length > 0 ? orders : []}
                 columns={columns}
                 columnVisibilityModel={{

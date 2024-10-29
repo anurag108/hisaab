@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import {
     GridRowsProp,
@@ -11,6 +11,8 @@ import {
     GridRenderCellParams,
     GridToolbarQuickFilter,
     GridToolbarFilterButton,
+    GridCallbackDetails,
+    MuiEvent,
 } from '@mui/x-data-grid';
 import { Order } from '../types';
 import { Chip, Grid2 } from '@mui/material';
@@ -221,6 +223,11 @@ export default function OrdersCrud(props: OrdersCrudProps) {
         },
     ];
 
+    const handleRowClick = async (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
+        const order = params.row;
+        await props.onOrderClick(order);
+    };
+
     return (
         <Box sx={{ height: '100%', width: '100%' }}>
             <DataGrid
@@ -255,7 +262,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                         },
                     },
                 }}
-
+                onRowClick={handleRowClick}
                 editMode="row"
                 showCellVerticalBorder
                 showColumnVerticalBorder

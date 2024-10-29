@@ -1,14 +1,17 @@
 import { Box, Chip, Grid2 } from "@mui/material";
 import { ExpandedOrderItem } from "../types";
-import mockOrders from "../data/orders.json"
 import {
     DataGrid,
+    GridCallbackDetails,
     GridColDef,
     GridRenderCellParams,
+    GridRowParams,
+    GridRowsProp,
     GridToolbarContainer,
     GridToolbarExport,
     GridToolbarFilterButton,
-    GridToolbarQuickFilter
+    GridToolbarQuickFilter,
+    MuiEvent
 } from "@mui/x-data-grid";
 import { useState } from "react";
 
@@ -38,35 +41,13 @@ function DataToolbar() {
 
 const VISIBLE_COLUMNS = ['traderId', 'orderId', 'quantity', 'gateEntryNumber', 'vehicleNumber', 'deliveryDate', 'status', 'billNumber', 'claim'];
 
-export default function OrderItemsCrud() {
-    let initialItems: ExpandedOrderItem[] = [];
-    mockOrders.map((order) => {
-        const expandedItems = order.items.map((item) => {
-            return {
-                id: item.id,
-                businessId: order.businessId,
-                traderId: order.traderId,
-                partyId: item.partyId,
-                orderId: order.id,
-                quantity: item.quantity,
-                deliveredQuantity: item.deliveredQuantity,
-                vehicleNumber: item.vehicleNumber,
-                gateEntryNumber: item.gateEntryNumber,
-                billNumber: item.billNumber,
-                claim: item.claim,
-                bardana: item.bardana,
-                fumigation: item.fumigation,
-                cd2: item.cd2,
-                commission: item.commission,
-                otherDeductions: item.otherDeductions,
-                creationTime: item.creationTime,
-                deliveryDate: item.deliveryDate,
-                updateTime: item.updateTime,
-                status: item.status
-            };
-        });
-        initialItems = initialItems.concat(expandedItems);
-    });
+interface OrderItemsCrudProps {
+    initialItems: GridRowsProp,
+    onOrderClick: (orderItem: ExpandedOrderItem) => Promise<void>
+}
+
+export default function OrderItemsCrud(props: OrderItemsCrudProps) {
+    const { initialItems, onOrderClick } = props;
     const [items, setItems] = useState(initialItems);
 
     const baseColumnOptions = {
@@ -279,6 +260,11 @@ export default function OrderItemsCrud() {
         // },
     ];
 
+    const handleRowClick = async (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
+        const order = params.row;
+        await props.onOrderClick(order);
+    };
+
     return (
         <Box sx={{ height: '100%', width: '100%' }}>
             <DataGrid
@@ -327,7 +313,7 @@ export default function OrderItemsCrud() {
                         },
                     },
                 }}
-
+                onRowClick={handleRowClick}
                 editMode="row"
                 showCellVerticalBorder
                 showColumnVerticalBorder

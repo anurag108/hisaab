@@ -19,7 +19,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
 import OrderManager from './orders/OrderManager.react';
 import TradersCrud from './trader/TradersCrud.react';
-import OrderItemsCrud from './orders/OrderItemsCrud.react';
+import OrderItemsManager from './orders/OrderItemsManager.react';
 
 const theme = createTheme();
 const sidebarWidth = 180;
@@ -106,7 +106,7 @@ function App() {
         </Drawer>
 
         <Box>
-          {selectedTab === 'HOME' && <OrderItemsCrud />}
+          {selectedTab === 'HOME' && <OrderItemsManager />}
           {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
           {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
           {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}

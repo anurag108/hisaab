@@ -20,6 +20,7 @@ import { useState } from 'react';
 import OrderManager from './orders/OrderManager.react';
 import TradersCrud from './trader/TradersCrud.react';
 import OrderItemsManager from './orders/OrderItemsManager.react';
+import HisaabLogin from './login/HisaabLogin.react';
 
 const theme = createTheme();
 const sidebarWidth = 180;
@@ -45,7 +46,7 @@ function App() {
           </Toolbar>
         </AppBar>
 
-        <Drawer
+        {selectedTab !== 'LOGOUT' && <Drawer
           variant="permanent"
           sx={{
             width: sidebarWidth,
@@ -104,12 +105,14 @@ function App() {
             </ListItemButton>
           </List>
         </Drawer>
+        }
 
         <Box>
           {selectedTab === 'HOME' && <OrderItemsManager />}
           {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
           {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
           {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
+          {selectedTab === 'LOGOUT' && <HisaabLogin onLogin={() => setSelectedTab('HOME')} />}
         </Box>
       </Box>
     </ThemeProvider>

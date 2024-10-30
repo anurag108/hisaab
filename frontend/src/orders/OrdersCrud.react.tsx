@@ -23,7 +23,7 @@ function DataToolbar() {
     return (
         <GridToolbarContainer sx={{ mb: 2 }}>
             <Grid2 container width={'100%'}>
-                <Grid2 size={1}>
+                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                     <GridToolbarFilterButton slotProps={{
                         tooltip: { title: 'Filter purchase orders' },
                         button: { variant: 'contained', size: 'medium' }
@@ -32,7 +32,7 @@ function DataToolbar() {
                 <Grid2 size={'grow'}>
                     <GridToolbarQuickFilter />
                 </Grid2>
-                <Grid2 size={1}>
+                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <GridToolbarExport slotProps={{
                         tooltip: { title: 'Export purchase orders' },
                         button: { variant: 'contained', size: 'medium' }

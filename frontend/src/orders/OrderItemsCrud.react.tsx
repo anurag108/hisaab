@@ -2,6 +2,7 @@ import { Box, Chip, Grid2 } from "@mui/material";
 import { ExpandedOrderItem } from "../types";
 import {
     DataGrid,
+    GridActionsCellItem,
     GridCallbackDetails,
     GridColDef,
     GridRenderCellParams,
@@ -14,23 +15,25 @@ import {
     MuiEvent
 } from "@mui/x-data-grid";
 import { useState } from "react";
+import DoneIcon from '@mui/icons-material/Done';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 function DataToolbar() {
     return (
         <GridToolbarContainer sx={{ mb: 2 }}>
             <Grid2 container width={'100%'}>
-                <Grid2 size={1}>
+                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                     <GridToolbarFilterButton slotProps={{
-                        tooltip: { title: 'Filter purchase orders' },
+                        tooltip: { title: 'Filter purchase order items' },
                         button: { variant: 'contained', size: 'medium' }
                     }} />
                 </Grid2>
                 <Grid2 size={'grow'}>
                     <GridToolbarQuickFilter />
                 </Grid2>
-                <Grid2 size={1}>
+                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <GridToolbarExport slotProps={{
-                        tooltip: { title: 'Export purchase orders' },
+                        tooltip: { title: 'Export purchase order items' },
                         button: { variant: 'contained', size: 'medium' }
                     }} />
                 </Grid2>
@@ -182,87 +185,87 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             flex: 0.7,
             valueGetter: (_value, row) => `${row.deliveredQuantity - (row.claim / 100.0)}`
         },
-        // {
-        //     field: 'actions',
-        //     type: 'actions',
-        //     headerName: 'Actions',
-        //     ...baseColumnOptions,
-        //     cellClassName: 'actions',
-        //     flex: 0.5,
-        //     getActions: (params: GridRowParams) => {
-        //         const approveAction = (
-        //             <GridActionsCellItem
-        //                 label='Approve'
-        //                 icon={<DoneIcon />}
-        //                 onClick={async () => {
-        //                     // TODO: Call API
-        //                     // set status & update view
-        //                     const updatedItems = items.map((item) => {
-        //                         if (item.id === params.row.id) {
-        //                             item.status = 'APPROVED';
-        //                         }
-        //                         return item;
-        //                     })
-        //                     setItems(updatedItems);
-        //                 }}
-        //                 showInMenu />
-        //         );
+        {
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            ...baseColumnOptions,
+            cellClassName: 'actions',
+            flex: 0.5,
+            getActions: (params: GridRowParams) => {
+                const approveAction = (
+                    <GridActionsCellItem
+                        label='Approve'
+                        icon={<DoneIcon />}
+                        onClick={async () => {
+                            // TODO: Call API
+                            // set status & update view
+                            const updatedItems = items.map((item) => {
+                                if (item.id === params.row.id) {
+                                    item.status = 'APPROVED';
+                                }
+                                return item;
+                            })
+                            setItems(updatedItems);
+                        }}
+                        showInMenu />
+                );
 
-        //         const rejectAction = (
-        //             <GridActionsCellItem
-        //                 label='Reject'
-        //                 icon={<CancelIcon />}
-        //                 onClick={async () => {
-        //                     // TODO: Call API
-        //                     // set status & update view
-        //                     const updatedItems = items.map((item) => {
-        //                         if (item.id === params.row.id) {
-        //                             item.status = 'REJECTED';
-        //                         }
-        //                         return item;
-        //                     })
-        //                     setItems(updatedItems);
-        //                 }}
-        //                 showInMenu />
-        //         );
+                const rejectAction = (
+                    <GridActionsCellItem
+                        label='Reject'
+                        icon={<CancelIcon />}
+                        onClick={async () => {
+                            // TODO: Call API
+                            // set status & update view
+                            const updatedItems = items.map((item) => {
+                                if (item.id === params.row.id) {
+                                    item.status = 'REJECTED';
+                                }
+                                return item;
+                            })
+                            setItems(updatedItems);
+                        }}
+                        showInMenu />
+                );
 
-        //         const completeAction = (
-        //             <GridActionsCellItem
-        //                 label='Completed'
-        //                 icon={<CancelIcon />}
-        //                 onClick={async () => {
-        //                     // TODO: Call API
-        //                     // set status & update view
-        //                     const updatedItems = items.map((item) => {
-        //                         if (item.id === params.row.id) {
-        //                             item.status = 'COMPLETED';
-        //                         }
-        //                         return item;
-        //                     })
-        //                     setItems(updatedItems);
-        //                 }}
-        //                 showInMenu />
-        //         );
+                const completeAction = (
+                    <GridActionsCellItem
+                        label='Completed'
+                        icon={<CancelIcon />}
+                        onClick={async () => {
+                            // TODO: Call API
+                            // set status & update view
+                            const updatedItems = items.map((item) => {
+                                if (item.id === params.row.id) {
+                                    item.status = 'COMPLETED';
+                                }
+                                return item;
+                            })
+                            setItems(updatedItems);
+                        }}
+                        showInMenu />
+                );
 
-        //         switch (params.row.status) {
-        //             case 'PENDING_APPROVAL':
-        //                 return [approveAction, rejectAction];
-        //             case 'APPROVED':
-        //                 return [rejectAction, completeAction];
-        //             case 'REJECTED':
-        //                 return [approveAction];
-        //             case 'IN_PROGRESS':
-        //                 return [completeAction];
-        //             default:
-        //                 return [];
-        //         }
-        //     }
-        // },
+                switch (params.row.status) {
+                    case 'PENDING_APPROVAL':
+                        return [approveAction, rejectAction];
+                    case 'APPROVED':
+                        return [rejectAction, completeAction];
+                    case 'REJECTED':
+                        return [approveAction];
+                    case 'IN_PROGRESS':
+                        return [completeAction];
+                    default:
+                        return [];
+                }
+            }
+        },
     ];
 
     const handleRowClick = async (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
         const order = params.row;
-        await props.onOrderClick(order);
+        await onOrderClick(order);
     };
 
     return (

@@ -317,7 +317,6 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
                     },
                 }}
                 onRowClick={handleRowClick}
-                editMode="row"
                 showCellVerticalBorder
                 showColumnVerticalBorder
                 disableRowSelectionOnClick

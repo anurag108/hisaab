@@ -7,9 +7,8 @@ import {
     Menu,
     MenuItem,
     Avatar,
-    Button,
     Container,
-    Tooltip
+    Tooltip,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from "react";
@@ -26,11 +25,12 @@ const settings = [
 ];
 
 interface HisaabAppbarProps {
+    selectedTab: string,
     handleTabClick: (tabId: string) => void
 }
 
 export default function HisaabAppbar(props: HisaabAppbarProps) {
-    const { handleTabClick } = props;
+    const { selectedTab, handleTabClick } = props;
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -53,6 +53,7 @@ export default function HisaabAppbar(props: HisaabAppbarProps) {
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
+                    {/* for bigger screen */}
                     <Typography
                         variant="h4"
                         sx={{
@@ -66,16 +67,17 @@ export default function HisaabAppbar(props: HisaabAppbarProps) {
                     </Typography>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page) => (
-                            <Button
-                                key={page.id}
-                                onClick={() => { handleTabClick(page.id) }}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
-                            >
-                                {page.label}
-                            </Button>
+                            <MenuItem key={page.id} onClick={() => {
+                                handleTabClick(page.id);
+                            }} sx={
+                                selectedTab === page.id ? { border: 1, borderRadius: 1 } : {}
+                            }>
+                                <Typography sx={{ textAlign: 'center' }}>{page.label}</Typography>
+                            </MenuItem>
                         ))}
                     </Box>
 
+                    {/* for smaller screen */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton
                             size="large"
@@ -106,7 +108,7 @@ export default function HisaabAppbar(props: HisaabAppbarProps) {
                             {pages.map((page) => (
                                 <MenuItem key={page.id} onClick={() => {
                                     handleTabClick(page.id);
-                                }}>
+                                }} selected={selectedTab === page.id}>
                                     <Typography sx={{ textAlign: 'center' }}>{page.label}</Typography>
                                 </MenuItem>
                             ))}
@@ -122,7 +124,7 @@ export default function HisaabAppbar(props: HisaabAppbarProps) {
                             textDecoration: 'none',
                         }}
                     >
-                        Hisaab - Small Mode
+                        Hisaab
                     </Typography>
 
                     <Box sx={{ flexGrow: 0 }}>

@@ -10,8 +10,15 @@ import TradersCrud from './trader/TradersCrud.react';
 import OrderItemsManager from './orders/OrderItemsManager.react';
 import HisaabLogin from './login/HisaabLogin.react';
 import HisaabAppbar from './HisaabAppbar.react';
+import { indigo } from '@mui/material/colors';
 
-const theme = createTheme();
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: indigo[500],
+    }
+  }
+});
 
 function App() {
   const [selectedTab, setSelectedTab] = useState('HOME');
@@ -22,7 +29,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Box component="main">
-        <HisaabAppbar handleTabClick={handleTabClick} />
+        <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
         <Box sx={{ m: 1 }}>
           {selectedTab === 'HOME' && <OrderItemsManager />}
           {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}

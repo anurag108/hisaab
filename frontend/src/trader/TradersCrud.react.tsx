@@ -6,16 +6,18 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle
+    DialogTitle,
+    Grid2
 } from "@mui/material";
 import {
     DataGrid,
     GridColDef,
     GridSlots,
     GridToolbarContainer,
-    GridRowsProp,
     GridRenderCellParams,
     GridRowId,
+    GridToolbarFilterButton,
+    GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import AddIcon from '@mui/icons-material/Add';
 import { MouseEvent, useState } from "react";
@@ -28,10 +30,23 @@ interface InviteToolbarProps {
 
 function InviteToolbar(props: InviteToolbarProps) {
     return (
-        <GridToolbarContainer>
-            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={props.handleInviteDialogClick}>
-                Invite Trader
-            </Button>
+        <GridToolbarContainer sx={{ mb: 2 }}>
+            <Grid2 container width={'100%'}>
+                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={props.handleInviteDialogClick}>
+                        Invite Trader
+                    </Button>
+                </Grid2>
+                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <GridToolbarFilterButton slotProps={{
+                        tooltip: { title: 'Filter traders' },
+                        button: { variant: 'contained', size: 'medium' }
+                    }} />
+                </Grid2>
+                <Grid2 size={'grow'}>
+                    <GridToolbarQuickFilter />
+                </Grid2>
+            </Grid2>
         </GridToolbarContainer>
     );
 }
@@ -127,7 +142,7 @@ export default function TradersCrud() {
         {
             field: 'email',
             headerName: 'Email',
-            flex: 2.5,
+            flex: 3,
             ...baseColumnOptions
         },
         {
@@ -142,7 +157,7 @@ export default function TradersCrud() {
         {
             field: 'status',
             headerName: 'Status',
-            flex: 1.5,
+            flex: 2,
             ...baseColumnOptions,
             renderCell: (params: GridRenderCellParams) => {
                 if (params.value === 'DEACTIVATED') {
@@ -156,14 +171,14 @@ export default function TradersCrud() {
         {
             field: 'creationTime',
             headerName: 'Creation Time',
-            flex: 2,
+            flex: 1.5,
             valueGetter: (param: string) => new Date(parseInt(param)).toLocaleString(),
             ...baseColumnOptions
         },
         {
             field: 'updateTime',
             headerName: 'Last Update Time',
-            flex: 2,
+            flex: 1.5,
             valueGetter: (param: string) => new Date(parseInt(param)).toLocaleString(),
             ...baseColumnOptions
         },
@@ -171,7 +186,7 @@ export default function TradersCrud() {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
-            flex: 2,
+            flex: 1.5,
             ...baseColumnOptions,
             renderCell: (params: GridRenderCellParams) => {
                 const onDeactivateClick = (event: MouseEvent<HTMLElement>) => {
@@ -191,19 +206,18 @@ export default function TradersCrud() {
 
                 const onCancelInviteClick = async () => {
                     // TODO: Call API
-                    console.log("Cancelling invite");
                     const updatedTraders = traders.filter((trader) => trader.id !== params.id);
                     setTraders(updatedTraders);
                 };
 
                 const status = params.row.status;
                 if (status === 'DEACTIVATED') {
-                    return (<Button variant="contained" color="primary" onClick={onReactivateClick}>Reactivate Trader</Button>);
+                    return (<Button variant="contained" color="primary" onClick={onReactivateClick}>Reactivate</Button>);
                 } else if (status === 'INVITED') {
                     return (<Button variant="contained" color="primary" onClick={onCancelInviteClick}>Cancel Invite</Button>);
                 }
                 else {
-                    return (<Button variant="contained" color="error" onClick={onDeactivateClick}>Deactivate Trader</Button>);
+                    return (<Button variant="contained" color="error" onClick={onDeactivateClick}>Deactivate</Button>);
                 }
             },
         },
@@ -212,14 +226,54 @@ export default function TradersCrud() {
     return (
         <Box sx={{ height: '100%', width: '100%' }}>
             <DataGrid
+                sx={{
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                        whiteSpace: "normal",
+                        lineHeight: "normal",
+                        fontWeight: "bold",
+                    },
+                    "& .MuiDataGrid-columnHeader": {
+                        // Forced to use important since overriding inline styles
+                        height: "unset !important"
+                    },
+                    "& .MuiDataGrid-columnHeaders": {
+                        // Forced to use important since overriding inline styles
+                        maxHeight: "168px !important"
+                    },
+                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
+                        py: '8px',
+                        overflowWrap: 'break-word',
+                    },
+                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+                        py: '15px',
+                        overflowWrap: 'break-word',
+                    },
+                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
+                        py: '22px',
+                        overflowWrap: 'break-word',
+                    },
+                }}
                 rows={traders.length > 0 ? traders : []}
+                getEstimatedRowHeight={() => 200}
+                getRowHeight={() => 'auto'}
                 columns={columns}
                 columnVisibilityModel={{
                     id: false,
                 }}
+                initialState={{
+                    filter: {
+                        filterModel: {
+                            items: [],
+                            quickFilterExcludeHiddenColumns: true,
+                        },
+                    },
+                }}
+                showCellVerticalBorder
+                showColumnVerticalBorder
                 disableColumnMenu
                 disableRowSelectionOnClick
                 disableColumnResize
+                disableColumnSelector
                 slots={{
                     toolbar: InviteToolbar as GridSlots['toolbar'],
                 }}

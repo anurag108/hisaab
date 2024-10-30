@@ -84,7 +84,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             headerAlign: 'left',
             align: 'left',
             ...baseColumnOptions,
-            flex: 0.6,
+            flex: 0.4,
         },
         {
             field: 'rate',
@@ -99,13 +99,13 @@ export default function OrdersCrud(props: OrdersCrudProps) {
             field: 'contractDate',
             headerName: 'Contract Date',
             ...baseColumnOptions,
-            flex: 0.7,
+            flex: 0.4,
         },
         {
             field: 'deliveryDate',
-            headerName: 'Delivery Date',
+            headerName: 'Max Delivery Date',
             ...baseColumnOptions,
-            flex: 0.7,
+            flex: 0.4,
         },
         {
             field: 'status',
@@ -244,9 +244,23 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                     "& .MuiDataGrid-columnHeaders": {
                         // Forced to use important since overriding inline styles
                         maxHeight: "168px !important"
-                    }
+                    },
+                    '&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
+                        py: '8px',
+                        overflowWrap: 'break-word',
+                    },
+                    '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+                        py: '15px',
+                        overflowWrap: 'break-word',
+                    },
+                    '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
+                        py: '22px',
+                        overflowWrap: 'break-word',
+                    },
                 }}
                 rows={orders.length > 0 ? orders : []}
+                getEstimatedRowHeight={() => 200}
+                getRowHeight={() => 'auto'}
                 columns={columns}
                 columnVisibilityModel={{
                     id: false,
@@ -263,7 +277,6 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                     },
                 }}
                 onRowClick={handleRowClick}
-                editMode="row"
                 showCellVerticalBorder
                 showColumnVerticalBorder
                 disableRowSelectionOnClick

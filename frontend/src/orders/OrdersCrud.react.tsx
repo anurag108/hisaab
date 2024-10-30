@@ -276,7 +276,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                         },
                     },
                 }}
-                onRowClick={handleRowClick}
+                onRowDoubleClick={handleRowClick}
                 showCellVerticalBorder
                 showColumnVerticalBorder
                 disableRowSelectionOnClick

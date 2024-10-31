@@ -11,6 +11,7 @@ import OrderItemsManager from './orders/OrderItemsManager.react';
 import HisaabLogin from './login/HisaabLogin.react';
 import HisaabAppbar from './HisaabAppbar.react';
 import { indigo } from '@mui/material/colors';
+import { makePOSTCall } from './api';
 
 const theme = createTheme({
   palette: {
@@ -22,8 +23,11 @@ const theme = createTheme({
 
 function App() {
   const [selectedTab, setSelectedTab] = useState('HOME');
-  const handleTabClick = (tabId: string) => {
+  const handleTabClick = async (tabId: string) => {
     setSelectedTab(tabId);
+    if (tabId === 'LOGOUT') {
+      await makePOSTCall("/log/out", {});
+    }
   };
 
   return (

@@ -1,3 +1,5 @@
+==== Login
+curl -H 'Content-Type: application/json' -X POST http://localhost:8080/log/in -d '{ "email":"abc@anc.com","password":"akjsadfkja"}'
 
 ==== Create new business
 curl -H 'Content-Type: application/json' -X POST localhost:8080/business -d '{ "name":"<BIZ_NAME>","address":"<BIZ_ADDRESS>"}'

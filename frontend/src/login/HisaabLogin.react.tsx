@@ -1,5 +1,6 @@
 import { Box, Button, Stack, TextField } from "@mui/material";
 import { useState } from "react";
+import { makeGETCall, makePOSTCall } from "../api";
 
 interface HisaabLoginProps {
     onLogin: () => void
@@ -7,10 +8,27 @@ interface HisaabLoginProps {
 
 export default function HisaabLogin(props: HisaabLoginProps) {
     const [view, setView] = useState('LOGIN');
+    const [formState, setFormState] = useState({
+        email: '',
+        password: ''
+    });
 
     const handleLogin = async () => {
-        // TODO: Call Login API
-        props.onLogin();
+        try {
+            const response = await makePOSTCall(
+                '/log/in', {
+                email: formState.email,
+                password: formState.password
+            });
+            if (response?.status === 200) {
+                console.log('status', response?.status);
+                props.onLogin();
+            } else {
+                alert('status' + response?.status);
+            }
+        } catch (error) {
+            console.log("Error logging user", error);
+        }
     }
 
     const handleResetPassword = async () => {
@@ -38,6 +56,13 @@ export default function HisaabLogin(props: HisaabLoginProps) {
                         label="Email"
                         type="email"
                         variant="outlined"
+                        value={formState.email}
+                        onChange={(event) => {
+                            setFormState({
+                                email: event.target.value,
+                                password: formState.password
+                            });
+                        }}
                         required
                         fullWidth
                     />
@@ -46,6 +71,13 @@ export default function HisaabLogin(props: HisaabLoginProps) {
                         label="Password"
                         type="password"
                         variant="outlined"
+                        value={formState.password}
+                        onChange={(event) => {
+                            setFormState({
+                                email: formState.email,
+                                password: event.target.value
+                            });
+                        }}
                         required
                         fullWidth
                     />

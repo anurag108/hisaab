@@ -5,20 +5,24 @@ const router: Express = express();
 router.post("/in", async (req: Request, res: Response) => {
     const email = req.body.email;
     const password = req.body.password;
-    console.log('Email', email);
-    console.log('Password', password);
     const user = await checkLoginDetails(email, password);
     if (user == null) {
-        res.status(404).send("User not found");
+        res.send({
+            errorCode: "USER_NOT_FOUND",
+        });
     } else {
         req.session.user = user;
-        res.send("User logged in successfully");
+        res.send({
+            user
+        });
     }
 });
 
 router.post("/out", async (req: Request, res: Response) => {
     req.session.destroy((error) => {
-        console.log('Error logging out the user', error);
+        if (error) {
+            console.log('Error logging out the user', error);
+        }
     });
 });
 

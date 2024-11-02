@@ -1,35 +1,66 @@
-import { Box, Button, Stack, TextField } from "@mui/material";
+import { Box, Button, FormControl, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { makeGETCall, makePOSTCall } from "../api";
+import { makePOSTCall } from "../api";
+import { User } from "../types";
 
 interface HisaabLoginProps {
-    onLogin: () => void
+    onLogin: (user: User) => void
 }
 
 export default function HisaabLogin(props: HisaabLoginProps) {
+    const emailRegex: RegExp = /\S+@\S+\.\S+/;
     const [view, setView] = useState('LOGIN');
-    const [formState, setFormState] = useState({
-        email: '',
-        password: ''
-    });
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [emailErrorMessage, setEmailErrorMessage] = useState("");
+    const [loginErrorMessage, setLoginErrorMessage] = useState("");
+    const [isFormFilled, setIsFormFilled] = useState(false);
 
     const handleLogin = async () => {
-        try {
-            const response = await makePOSTCall(
-                '/log/in', {
-                email: formState.email,
-                password: formState.password
-            });
-            if (response?.status === 200) {
-                console.log('status', response?.status);
-                props.onLogin();
-            } else {
-                alert('status' + response?.status);
+        const isEmailValid = validateEmail(email);
+        if (!isEmailValid) {
+            setEmailErrorMessage("Please enter a valid email");
+        } else {
+            try {
+                const response = await makePOSTCall(
+                    '/log/in', {
+                    email,
+                    password
+                });
+                const data = await response.json();
+                if (response?.status === 200 && data.user) {
+                    props.onLogin(data.user);
+                } else {
+                    setLoginErrorMessage("Incorrect credentials");
+                }
+            } catch (error) {
+                console.log("Error logging user", error);
+                setLoginErrorMessage("Something went wrong. Please try again");
             }
-        } catch (error) {
-            console.log("Error logging user", error);
         }
     }
+
+    function validateEmail(email: string) {
+        return emailRegex.test(email);
+    }
+
+    const onChangeEmailField = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(event.target.value);
+        if (event.target.value !== "" && password !== "") {
+            setIsFormFilled(true);
+        } else {
+            setIsFormFilled(false);
+        }
+    };
+
+    const onChangePasswordField = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value);
+        if (email !== "" && event.target.value !== "") {
+            setIsFormFilled(true);
+        } else {
+            setIsFormFilled(false);
+        }
+    };
 
     const handleResetPassword = async () => {
         // TODO: Call Reset Password API
@@ -56,33 +87,32 @@ export default function HisaabLogin(props: HisaabLoginProps) {
                         label="Email"
                         type="email"
                         variant="outlined"
-                        value={formState.email}
-                        onChange={(event) => {
-                            setFormState({
-                                email: event.target.value,
-                                password: formState.password
-                            });
-                        }}
+                        value={email}
+                        onChange={onChangeEmailField}
                         required
                         fullWidth
+                        error={emailErrorMessage !== ''}
+                        helperText={emailErrorMessage !== '' && "Please enter a valid email"}
                     />
                     <TextField
                         id="password"
                         label="Password"
                         type="password"
                         variant="outlined"
-                        value={formState.password}
-                        onChange={(event) => {
-                            setFormState({
-                                email: formState.email,
-                                password: event.target.value
-                            });
-                        }}
+                        value={password}
+                        onChange={onChangePasswordField}
                         required
                         fullWidth
                     />
-                    <Button variant="contained" color="primary" onClick={handleLogin}>Sign In</Button>
-                    <Button variant="text" onClick={() => { setView('FORGOT_PASSWORD') }}>Forgot Password?</Button>
+                    {loginErrorMessage !== "" && <Typography variant="body1" color="error">{loginErrorMessage}</Typography>}
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={!isFormFilled}
+                        onClick={handleLogin}>
+                        Sign In
+                    </Button>
+                    {/* <Button variant="text" onClick={() => { setView('FORGOT_PASSWORD') }}>Forgot Password?</Button> */}
                 </Stack>
             }
             {

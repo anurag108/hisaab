@@ -1,3 +1,13 @@
+export interface User {
+    id: string,
+    name: string,
+    email: string,
+    phoneNumber: string,
+    status: string,
+    creationTime: string,
+    updateTime: string
+}
+
 export enum OrderStatus {
     PENDING_APPROVAL = "PENDING_APPROVAL",
     APPROVED = "APPROVED",

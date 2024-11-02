@@ -19,7 +19,6 @@ export async function checkLoginDetails(email: string, password: string) {
             where('status', '==', 'ACTIVE')
         )
     );
-    console.log('User Snapshot', userSnapshot.size);
     if (userSnapshot.empty) {
         return null;
     }

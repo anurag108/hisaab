@@ -12,6 +12,7 @@ import HisaabLogin from './login/HisaabLogin.react';
 import HisaabAppbar from './HisaabAppbar.react';
 import { indigo } from '@mui/material/colors';
 import { makePOSTCall } from './api';
+import { UserProvider } from './UserContext';
 
 const theme = createTheme({
   palette: {
@@ -26,22 +27,25 @@ function App() {
   const handleTabClick = async (tabId: string) => {
     setSelectedTab(tabId);
     if (tabId === 'LOGOUT') {
+      localStorage.removeItem("user");
       await makePOSTCall("/log/out", {});
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Box component="main">
-        <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
-        <Box sx={{ m: 1 }}>
-          {selectedTab === 'HOME' && <OrderItemsManager />}
-          {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
-          {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
-          {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
-          {selectedTab === 'LOGOUT' && <HisaabLogin onLogin={() => setSelectedTab('HOME')} />}
+      <UserProvider>
+        <Box component="main">
+          <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
+          <Box sx={{ m: 1 }}>
+            {selectedTab === 'HOME' && <OrderItemsManager />}
+            {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
+            {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
+            {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
+            {selectedTab === 'LOGOUT' && <HisaabLogin onLogin={() => setSelectedTab('HOME')} />}
+          </Box>
         </Box>
-      </Box>
+      </UserProvider>
     </ThemeProvider>
   );
 }

@@ -22,6 +22,8 @@ export type Business = {
     id: string;
     name: string;
     address: string;
+    gstNumber: string,
+    pan: string,
     status: BusinessStatus;
     creationTime: number;
     updateTime: number;

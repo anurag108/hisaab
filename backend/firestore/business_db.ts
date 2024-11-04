@@ -2,6 +2,7 @@ import {
 	getFirestore, collection, doc, getDoc, addDoc,
 	DocumentSnapshot,
 	DocumentData,
+	updateDoc,
 } from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
 
@@ -15,6 +16,8 @@ function makeBizFromSnapshot(bizSnapshot: DocumentSnapshot) {
 		id: bizSnapshot.id,
 		name: bizData.name,
 		address: bizData.address,
+		gstNumber: bizData.gstNumber,
+		pan: bizData.pan,
 		status: bizData.status,
 		creationTime: bizData.creationTime,
 		updateTime: bizData.updateTime,
@@ -29,10 +32,16 @@ export async function getBusiness(businessId: string) {
 	return makeBizFromSnapshot(bizSnapshot);
 }
 
-export async function createNewBusiness(name: string, address: string) {
+export async function createNewBusiness(
+	name: string,
+	address: string,
+	gstNumber: string,
+	pan: string) {
 	const bizData = {
-		name: name,
-		address: address,
+		name,
+		address,
+		gstNumber,
+		pan,
 		status: "ACTIVE",
 		creationTime: Date.now(),
 		udpateTime: Date.now()
@@ -42,4 +51,9 @@ export async function createNewBusiness(name: string, address: string) {
 		id: docRef.id,
 		...bizData
 	}
+}
+
+export async function updateBusiness(businessId: string, bizData: any) {
+	const bizRef = doc(db, bizCollectionName, businessId);
+	await updateDoc(bizRef, bizData);
 }

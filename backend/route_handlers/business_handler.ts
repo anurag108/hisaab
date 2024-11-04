@@ -1,17 +1,49 @@
 import express, { Express, Request, Response } from "express";
 const router: Express = express();
 
-import { getBusiness, createNewBusiness } from "../firestore/business_db";
+import { getBusiness, createNewBusiness, updateBusiness } from "../firestore/business_db";
 import { getBrokerByEmail, createInvitedBrokerAccount } from "../firestore/broker_db";
 import { fetchBizBrokerMapping, removeBizBrokerMapping, createNewBrokerInvitation } from "../firestore/business_broker_db";
 
 router.get("/:businessId", async (req: Request, res: Response) => {
 	const biz = await getBusiness(req.params.businessId);
-	res.send(biz);
+	res.send({
+		biz
+	});
 });
 
 router.post("/", async (req: Request, res: Response) => {
-	res.send(await createNewBusiness(req.body.name, req.body.address));
+	const biz = await createNewBusiness(
+		req.body.name,
+		req.body.address,
+		req.body.gstNumber,
+		req.body.pan
+	);
+	res.send({
+		biz
+	});
+});
+
+router.post("/:businessId", async (req: Request, res: Response) => {
+	const businessId = req.params.businessId;
+	const biz = await getBusiness(businessId);
+	if (!biz) {
+		throw new Error("BIZ_NOT_FOUND");
+	}
+	const updatedBizData = {
+		name: req.body.name ?? biz.name,
+		address: req.body.address ?? biz.address,
+		gstNumber: req.body.gstNumber ?? biz.gstNumber,
+		pan: req.body.pan ?? biz.pan,
+		updateTime: Date.now()
+	};
+	await updateBusiness(businessId, updatedBizData);
+	res.send({
+		id: biz.id,
+		...updatedBizData,
+		status: biz.status,
+		creationTime: biz.creationTime
+	});
 });
 
 router.post("/invite_broker", async (req: Request, res: Response) => {

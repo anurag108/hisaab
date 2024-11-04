@@ -21,7 +21,10 @@ function buildUserFromSnapshot(userSnapshot: QuerySnapshot<DocumentData, Documen
         id: userSnap.id,
         name: data.name,
         email: data.email,
-        phoneNumber: data.phoneNumber,
+        phone: {
+            countryCode: data.countryCode,
+            phoneNumber: data.phoneNumber,
+        },
         status: data.status,
         creationTime: data.creationTime,
         updateTime: data.updateTime
@@ -60,10 +63,11 @@ export async function genUserByEmail(email: string) {
     return buildUserFromSnapshot(userQuerySnapshot);
 }
 
-export async function signupNewUser(name: string, phoneNumber: string, email: string, password: string) {
+export async function signupNewUser(name: string, countryCode: string, phoneNumber: string, email: string, password: string) {
     const currTime = Date.now();
     const userRef = await addDoc(userCollectionRef, {
         name,
+        countryCode,
         phoneNumber,
         email,
         password,
@@ -74,6 +78,7 @@ export async function signupNewUser(name: string, phoneNumber: string, email: st
     return {
         id: userRef.id,
         name,
+        countryCode,
         phoneNumber,
         email,
         status: "PENDING_EMAIL_VERIFICATION",

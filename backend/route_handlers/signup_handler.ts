@@ -4,12 +4,19 @@ const router: Express = express();
 
 router.post("/", async (req: Request, res: Response) => {
     const name = req.body.name;
+    const countryCode = req.body.countryCode;
     const phoneNumber = req.body.phoneNumber;
     const email = req.body.email;
     const password = req.body.password;
     const user = await genUserByEmail(email);
     if (user == null) {
-        const user = await signupNewUser(name, phoneNumber, email, password);
+        const user = await signupNewUser(
+            name,
+            countryCode,
+            phoneNumber,
+            email,
+            password
+        );
         // send verification email
         res.send({
             user

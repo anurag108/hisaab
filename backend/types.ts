@@ -1,8 +1,13 @@
+export interface PhoneNumber {
+    countryCode: string,
+    phoneNumber: string,
+}
+
 export interface User {
     id: string,
     name: string,
     email: string,
-    phoneNumber: string,
+    phone: PhoneNumber,
     status: string,
     creationTime: string,
     updateTime: string

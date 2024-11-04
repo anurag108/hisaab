@@ -4,6 +4,9 @@ import {
     getDocs,
     query,
     where,
+    QuerySnapshot,
+    DocumentData,
+    addDoc,
 } from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
 
@@ -11,21 +14,7 @@ const userCollectionName = "user";
 const db = getFirestore(firebaseApp);
 const userCollectionRef = collection(db, userCollectionName);
 
-export async function checkLoginDetails(email: string, password: string) {
-    const userSnapshot = await getDocs(
-        query(userCollectionRef,
-            where('email', '==', email),
-            where('password', '==', password),
-            where('status', '==', 'ACTIVE')
-        )
-    );
-    if (userSnapshot.empty) {
-        return null;
-    }
-    if (userSnapshot.size > 1) {
-        throw new Error("Multiple users found for the same email");
-    }
-
+function buildUserFromSnapshot(userSnapshot: QuerySnapshot<DocumentData, DocumentData>) {
     const userSnap = userSnapshot.docs[0];
     const data = userSnap.data();
     return {
@@ -37,4 +26,58 @@ export async function checkLoginDetails(email: string, password: string) {
         creationTime: data.creationTime,
         updateTime: data.updateTime
     };
+}
+
+export async function checkLoginDetails(email: string, password: string) {
+    const userQuerySnapshot = await getDocs(
+        query(userCollectionRef,
+            where('email', '==', email),
+            where('password', '==', password),
+            where('status', '==', 'ACTIVE')
+        )
+    );
+    if (userQuerySnapshot.empty) {
+        return null;
+    }
+    if (userQuerySnapshot.size > 1) {
+        throw new Error("Multiple users found for the same email");
+    }
+    return buildUserFromSnapshot(userQuerySnapshot);
+}
+
+export async function genUserByEmail(email: string) {
+    const userQuerySnapshot = await getDocs(
+        query(userCollectionRef,
+            where('email', '==', email),
+        )
+    );
+    if (userQuerySnapshot.empty) {
+        return null;
+    }
+    if (userQuerySnapshot.size > 1) {
+        throw new Error("Multiple users found for the same email");
+    }
+    return buildUserFromSnapshot(userQuerySnapshot);
+}
+
+export async function signupNewUser(name: string, phoneNumber: string, email: string, password: string) {
+    const currTime = Date.now();
+    const userRef = await addDoc(userCollectionRef, {
+        name,
+        phoneNumber,
+        email,
+        password,
+        status: "PENDING_EMAIL_VERIFICATION",
+        creationTime: currTime,
+        updateTime: currTime
+    });
+    return {
+        id: userRef.id,
+        name,
+        phoneNumber,
+        email,
+        status: "PENDING_EMAIL_VERIFICATION",
+        creationTime: currTime,
+        updateTime: currTime
+    }
 }

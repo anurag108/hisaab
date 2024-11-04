@@ -3,6 +3,7 @@ import session from "express-session";
 import cors from "cors";
 
 import loginHandler from "./route_handlers/login_handler";
+import signupHandler from "./route_handlers/signup_handler";
 import bizHandler from "./route_handlers/business_handler";
 import brokerHandler from "./route_handlers/broker_handler";
 import poHandler from "./route_handlers/po_handler";
@@ -35,6 +36,7 @@ app.use(session({
 // });
 
 app.use("/log", loginHandler);
+app.use("/signup", signupHandler);
 app.use("/business", bizHandler);
 app.use("/broker", brokerHandler);
 app.use("/po", poHandler);

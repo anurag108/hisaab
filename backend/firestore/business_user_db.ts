@@ -1,4 +1,4 @@
-import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, where, query, QueryCompositeFilterConstraint } from "firebase/firestore";
+import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, where, query, QueryCompositeFilterConstraint, getDoc, DocumentData } from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
 import { BizUserMapping, BizUserMappingStatus, BizUserRole, InvitationDecision } from "../types";
 
@@ -38,6 +38,26 @@ export async function createNewTraderInvitation(businessId: string, userId: stri
 		id: inviteRef.id,
 		...inviteData,
 	}
+}
+
+function buildInviteFromSnapshot(invitationId: string, inviteData: DocumentData) {
+	return {
+		id: invitationId,
+		businessId: inviteData.businessId as string,
+		userId: inviteData.userId as string,
+		role: inviteData.role as string,
+		status: inviteData.status as BizUserMappingStatus,
+		creationTime: inviteData.creatimeTime as number,
+		updateTime: inviteData.updateTime as number
+	}
+}
+
+export async function fetchTraderInvitation(invitationId: string) {
+	const inviteSnapshot = await getDoc(doc(db, bizUserCollection, invitationId));
+	if (!inviteSnapshot.exists()) {
+		return null;
+	}
+	return buildInviteFromSnapshot(invitationId, inviteSnapshot.data());
 }
 
 export async function updateTraderInvitationStatus(invitationId: string, status: BizUserMappingStatus) {
@@ -85,16 +105,7 @@ export async function fetchBizUserMapping(businessId: string, userId: string, ro
 		return null;
 	}
 	const snap = docSnapshot.docs[0];
-	const data = snap.data();
-	return {
-		id: snap.id,
-		businessId: data.businessId as string,
-		userId: data.userId as string,
-		role: data.role as string,
-		status: data.status as BizUserMappingStatus,
-		creationTime: data.creatimeTime as number,
-		updateTime: data.updateTime as number
-	}
+	return buildInviteFromSnapshot(snap.id, snap.data());
 }
 
 export async function handleInvitationAction(invitationId: string, decision: InvitationDecision) {

@@ -1,33 +1,26 @@
 import express, { Express, Request, Response } from "express";
 const router: Express = express();
 
-import { getBroker, createNewBroker, createNewParty } from "../firestore/trader_db";
-import { handleInvitationAction } from "../firestore/business_user_db";
-
-router.get("/:brokerId", async (req: Request, res: Response) => {
-	res.send(await getBroker(req.params.brokerId));
-});
-
-router.post("/", async (req: Request, res: Response) => {
-	res.send(await createNewBroker(
-		req.body.name,
-		req.body.phoneNumber,
-		req.body.email,
-		req.body.password
-	)
-	);
-});
-
-router.post("/party", async (req: Request, res: Response) => {
-	await createNewParty(req.body.brokerId, req.body.name, req.body.address, req.body.pan, req.body.gstNumber);
-	res.send("New party created");
-});
+import { fetchTraderInvitation, updateTraderInvitationStatus } from "../firestore/business_user_db";
+import { decryptInvitationInfo } from "../encryption_utils";
+import { BizUserMappingStatus } from "../types";
 
 router.post("/invitation", async (req: Request, res: Response) => {
-	// const broker = await brokerDb.getBroker(req.body.brokerId);
-	await handleInvitationAction(req.body.invitationId, req.body.decision);
-	// notify business
-	res.send("Invitation processed");
+	const invitationId = decryptInvitationInfo(req.body.invitationCipher);
+	const invitation = await fetchTraderInvitation(invitationId);
+	if (!invitation || invitation.status !== BizUserMappingStatus.INVITED) {
+		res.send({
+			error: true,
+			errorCode: "INVITATION_NOT_FOUND"
+		});
+	} else {
+		const status = req.body.decision === "ACCEPT" ? BizUserMappingStatus.ACTIVE : BizUserMappingStatus.INVITE_REJECTED;
+		await updateTraderInvitationStatus(invitation.id, status);
+		// TODO: notify business
+		res.send({
+			error: false
+		});
+	}
 });
 
 export default router;

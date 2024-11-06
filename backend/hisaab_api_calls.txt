@@ -31,26 +31,25 @@ curl -H 'Content-Type: application/json' -X POST localhost:8080/business/deactiv
 curl -H 'Content-Type: application/json' -X GET localhost:8080/business/0WPwZoM10n1J0O7YFsLo/traders
 
 ========== TRADER ==========
-==== Create new broker
-curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "name": "<NAME>", "email":"<EMAIL>", "password":"<PASSWORD>", "phoneNumber":"<PHONE>"}'
+## Respond to invitation
+curl -H 'Content-Type: application/json' -X POST localhost:8080/trader/invitation -d '{ "invitationId": "<>", "decision":"<>"}'
 
-==== Create new party
-curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "name": "<>", "address":"<>", "pan":"<>", "gstNumber":"<>"}'
+## Create new Purchase Order
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po -d '{}'
 
-==== Get Broker details
-curl -H 'Content-Type: application/json' -X GET localhost:8080/broker/<>/
+## Update Purchase Order
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/:poId -d '{}'
 
-==== Respond to invitation
-curl -H 'Content-Type: application/json' -X POST localhost:8080/broker/invitation -d '{ "invitationId": "<>", "decision":"<>"}'
+## Create new Purchase Order items
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/item -d '{}'
 
-==== Fetch POs
+## Update Purchase Order item
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/:poId/item/:itemId -d '{}'
+
+========== PURCHASE_ORDERS ==========
+
+## Fetch POs
 curl -H 'Content-Type: application/json' -X GET localhost:8080/po
-
-==== Create new PO
-curl -H 'Content-Type: application/json' -X POST localhost:8080/po -d '{ "invitationId": "<>", "decision":"<>"}'
-
-
-
 
 curl -H 'Content-Type: application/json' -X POST localhost:8080/ZQO0zqKhEzwuqpE40U1p/po/new -d '{ "broker_id":"<RANDOM_BROKER_ID>","body":"bar", "id": 1}'
 

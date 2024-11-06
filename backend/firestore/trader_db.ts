@@ -13,7 +13,7 @@ import {
 }
 	from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
-import { Broker, BrokerStatus, Party, PartyStatus } from "../types";
+import { Trader, BrokerStatus, Party, PartyStatus } from "../types";
 
 const db = getFirestore(firebaseApp);
 const brokerCollectionName = "broker";

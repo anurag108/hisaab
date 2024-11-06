@@ -1,8 +1,8 @@
 import express, { Express, Request, Response } from "express";
 const router: Express = express();
 
-import { getBroker, createNewBroker, createNewParty } from "../firestore/broker_db";
-import { handleInvitationAction } from "../firestore/business_broker_db";
+import { getBroker, createNewBroker, createNewParty } from "../firestore/trader_db";
+import { handleInvitationAction } from "../firestore/business_user_db";
 
 router.get("/:brokerId", async (req: Request, res: Response) => {
 	res.send(await getBroker(req.params.brokerId));

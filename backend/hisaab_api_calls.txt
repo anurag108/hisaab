@@ -1,18 +1,36 @@
-==== Login
-curl -H 'Content-Type: application/json' -X POST http://localhost:8080/log/in -d '{ "email":"abc@anc.com","password":"akjsadfkja"}'
+========== AUTHENTICATION ==========
+## Login
+curl -H 'Content-Type: application/json' -X POST http://localhost:8080/log/in -d '{ "email":"anurag.gupta108@gmail.com","password":"Qwedsa@123"}'
 
-==== Signup new user
-curl -H 'Content-Type: application/json' -X POST http://localhost:8080/signup -d '{ "name":"Anurag Gupta", "countryCode":"91", "phoneNumber": "8130992702", "email":"severus.snape987@gmail.com","password":"akjsadfkja"}'
+## Signup new user
+curl -H 'Content-Type: application/json' -X POST http://localhost:8080/signup -d '{ "name":"Anurag Gupta", "countryCode":"91", "phoneNumber": "8130992702", "email":"anurag.gupta108@gmail.com","password":"Qwedsa@123"}'
 
-==== Create new business
-curl -H 'Content-Type: application/json' -X POST localhost:8080/business -d '{ "name":"<BIZ_NAME>","address":"<BIZ_ADDRESS>"}'
+## Logout
+curl -H 'Content-Type: application/json' -X POST http://localhost:8080/log/out
 
-==== Fetch a business
-curl -H 'Content-Type: application/json' -X GET localhost:8080/business/aBfJosYmhg7dsKOQ56lr/
+========== BUSINESS ==========
+## Create new business
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business -d '{ "name":"Anurag Enterprises","address":"34 Chanderlok Enclave, Pitampura, New Delhi - 110034", "gstNumber":"786908082309203", "pan":"ASXPG4332J"}'
 
-==== Invite Broker
-curl -H 'Content-Type: application/json' -X POST localhost:8080/business/invite_broker -d '{ "brokerEmail":"<BROKER_EMAIL>"}'
+## Update a business
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business/0WPwZoM10n1J0O7YFsLo -d '{ "name":"Anurag Enterprises Pvt. Ltd.", "gstNumber":"98792798982323"}'
 
+## Fetch a business
+curl -H 'Content-Type: application/json' -X GET localhost:8080/business/0WPwZoM10n1J0O7YFsLo/
+
+## Invite Trader
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business/invite/new -d '{ "businessId":"0WPwZoM10n1J0O7YFsLo", "email":"severus.snape987@gmail.com"}'
+
+## Cancel Trader Invite
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business/invite/cancel -d '{ "businessId":"0WPwZoM10n1J0O7YFsLo", "traderId": "zjuQr2dnOlsBWslmpjRo"}'
+
+## Deactivate Trader
+curl -H 'Content-Type: application/json' -X POST localhost:8080/business/deactivate/trader -d '{ "businessId":"0WPwZoM10n1J0O7YFsLo", "traderId": "zjuQr2dnOlsBWslmpjRo"}'
+
+## Fetch all traders
+curl -H 'Content-Type: application/json' -X GET localhost:8080/business/0WPwZoM10n1J0O7YFsLo/traders
+
+========== TRADER ==========
 ==== Create new broker
 curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "name": "<NAME>", "email":"<EMAIL>", "password":"<PASSWORD>", "phoneNumber":"<PHONE>"}'
 

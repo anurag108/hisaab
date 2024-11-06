@@ -3,19 +3,25 @@ export interface PhoneNumber {
     phoneNumber: string,
 }
 
+export enum UserStatus {
+    PENDING_EMAIL_VERIFICATION = "PENDING_EMAIL_VERIFICATION",
+    ACTIVE = "ACTIVE",
+    DEACTIVATED = "DEACTIVATED"
+}
+
 export interface User {
     id: string,
     name: string,
     email: string,
     phone: PhoneNumber,
-    status: string,
-    creationTime: string,
-    updateTime: string
+    status: UserStatus,
+    creationTime: number,
+    updateTime: number
 }
 
 export enum BusinessStatus {
-    ACTIVE,
-    INACTIVE
+    ACTIVE = "ACTIVE",
+    DEACTIVATED = "DEACTIVATED"
 };
 
 export type Business = {
@@ -29,13 +35,36 @@ export type Business = {
     updateTime: number;
 };
 
+export enum BizUserRole {
+    OWNER = "OWNER",
+    TRADER = "TRADER",
+}
+
+export enum BizUserMappingStatus {
+    INVITED = "INVITED",
+    INVITE_CANCELLED = "INVITE_CANCELLED",
+    INVITE_REJECTED = "INVITE_REJECTED",
+    ACTIVE = "ACTIVE",
+    DEACTIVATED = "DEACTIVATED"
+};
+
+export type BizUserMapping = {
+    id: string;
+    businessId: string;
+    userId: string;
+    role: BizUserRole;
+    status: BizUserMappingStatus;
+    creationTime: number;
+    updateTime: number;
+};
+
 export enum BrokerStatus {
     INVITED,
     ACTIVE,
     INACTIVE,
 }
 
-export type Broker = {
+export type Trader = {
     id: string;
     name: string;
     email: string;
@@ -65,21 +94,6 @@ export type Party = {
 export enum InvitationDecision {
     ACCEPT,
     REJECT
-};
-
-export enum BizBrokerMappingStatus {
-    INVITED,
-    MAPPING_ACTIVE,
-    INVITATION_CANCELLED,
-    MAPPING_REMOVED
-};
-
-export type BizBrokerMapping = {
-    businessId: string;
-    brokerId: string;
-    status: BizBrokerMappingStatus;
-    creationTime: number;
-    updateTime: number;
 };
 
 export enum POStatus {

@@ -5,6 +5,7 @@ import {
 	updateDoc,
 } from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
+import { BusinessStatus } from "../types";
 
 const bizCollectionName = "business";
 const db = getFirestore(firebaseApp);
@@ -42,7 +43,7 @@ export async function createNewBusiness(
 		address,
 		gstNumber,
 		pan,
-		status: "ACTIVE",
+		status: BusinessStatus.ACTIVE,
 		creationTime: Date.now(),
 		udpateTime: Date.now()
 	};

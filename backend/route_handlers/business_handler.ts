@@ -1,30 +1,49 @@
 import express, { Express, Request, Response } from "express";
 const router: Express = express();
 
-import { getBusiness, createNewBusiness, updateBusiness } from "../firestore/business_db";
-import { getBrokerByEmail, createInvitedBrokerAccount } from "../firestore/broker_db";
-import { fetchBizBrokerMapping, removeBizBrokerMapping, createNewBrokerInvitation } from "../firestore/business_broker_db";
+import {
+	getBusiness,
+	createNewBusiness,
+	updateBusiness
+} from "../firestore/business_db";
+import {
+	removeBizTraderMapping,
+	createNewTraderInvitation,
+	fetchBizUserMapping,
+	cancelTraderInvitation,
+	fetchAllBizTraderMappings,
+	createBizOwnerMapping,
+	updateTraderInvitationStatus
+} from "../firestore/business_user_db";
+import { createPartialUser, genUserByEmail, genUsers } from "../firestore/user_db";
+import { BizUserMappingStatus, BizUserRole } from "../types";
 
 router.get("/:businessId", async (req: Request, res: Response) => {
 	const biz = await getBusiness(req.params.businessId);
 	res.send({
+		error: false,
 		biz
 	});
 });
 
 router.post("/", async (req: Request, res: Response) => {
+	const user = req.session.user;
+	if (!user) { return; }
 	const biz = await createNewBusiness(
 		req.body.name,
 		req.body.address,
 		req.body.gstNumber,
 		req.body.pan
 	);
+	await createBizOwnerMapping(biz.id, user.id);
 	res.send({
+		error: false,
 		biz
 	});
 });
 
 router.post("/:businessId", async (req: Request, res: Response) => {
+	// TODO: Authorize so that only OWNER is able to do this
 	const businessId = req.params.businessId;
 	const biz = await getBusiness(businessId);
 	if (!biz) {
@@ -39,43 +58,117 @@ router.post("/:businessId", async (req: Request, res: Response) => {
 	};
 	await updateBusiness(businessId, updatedBizData);
 	res.send({
-		id: biz.id,
-		...updatedBizData,
-		status: biz.status,
-		creationTime: biz.creationTime
+		error: false,
+		biz: {
+			id: biz.id,
+			...updatedBizData,
+			status: biz.status,
+			creationTime: biz.creationTime
+		}
 	});
 });
 
-router.post("/invite_broker", async (req: Request, res: Response) => {
-	// validate email
-	var broker = await getBrokerByEmail(req.body.brokerEmail);
-	if (!broker) {
-		broker = await createInvitedBrokerAccount(req.body.brokerEmail);
-	}
-	// check if business <-> broker mapping already exists
+router.post("/invite/new", async (req: Request, res: Response) => {
+	// TODO: validate email & businessId
+	const email = req.body.email;
 	const businessId = req.body.businessId;
-	const mapping = await fetchBizBrokerMapping(businessId, broker.id);
-	if (!mapping) {
-		await createNewBrokerInvitation(businessId, broker.id);
-		// send email to broker
-		res.send("Invitation sent to broker");
+
+	// TODO: authorize this operation. Only a business user can do this
+	let user = await genUserByEmail(email);
+	if (!user) {
+		user = await createPartialUser(email);
+	}
+	if (user.status === "DEACTIVATED") {
+		res.send({
+			error: true,
+			errorCode: "USER_DEACTIVATED"
+		});
 	} else {
-		if (mapping.status == "INVITED") {
-			res.send("Broker already invited");
+		let invitation = await fetchBizUserMapping(businessId, user.id);
+		if (!invitation) {
+			invitation = await createNewTraderInvitation(businessId, user.id);
+			// TODO: send email to trader
+			res.send({
+				error: false,
+			})
 		} else {
-			res.send("Broker already mapped");
+			if (invitation.role === BizUserRole.OWNER) {
+				res.send({
+					error: true,
+					errorCode: "OWNER_CANNOT_BE_INVITED"
+				});
+			} else if (invitation.status === BizUserMappingStatus.INVITE_REJECTED
+				|| invitation.status === BizUserMappingStatus.DEACTIVATED
+			) {
+				res.send({
+					error: true,
+					errorCode: "USER_CANNOT_BE_INVITED"
+				});
+			} else if (invitation.status === BizUserMappingStatus.ACTIVE || invitation.status === BizUserMappingStatus.INVITED) {
+				res.send({
+					error: true,
+					errorCode: "USER_ALREADY_ACTIVE_OR_INVITED"
+				});
+			} else if (invitation.status === BizUserMappingStatus.INVITE_CANCELLED) {
+				await updateTraderInvitationStatus(invitation.id, BizUserMappingStatus.INVITED);
+				// TODO: send another email
+				res.send({
+					error: false
+				});
+			}
 		}
 	}
-	// send email to broker
 });
 
-router.post("/cancel_invite", async (req: Request, res: Response) => {
-	res.send("This functionality is coming soon");
+router.post("/invite/cancel", async (req: Request, res: Response) => {
+	// TODO: authorize this operation. Only a business user can do this
+	const businessId = req.body.businessId;
+	const traderId = req.body.traderId;
+	let invitation = await fetchBizUserMapping(businessId, traderId, BizUserRole.TRADER);
+	if (invitation && invitation.status === BizUserMappingStatus.INVITED) {
+		await cancelTraderInvitation(businessId, traderId);
+	} else {
+		throw new Error("INVITATION_NOT_FOUND");
+	}
+	res.send();
 });
 
-router.post("/remove_broker", async (req: Request, res: Response) => {
-	await removeBizBrokerMapping(req.body.businessId, req.body.brokerId);
-	res.send("Biz broker mapping removed");
+router.post("/deactivate/trader", async (req: Request, res: Response) => {
+	// TODO: authorize this operation. Only a business user can do this
+	const businessId = req.body.businessId;
+	const traderId = req.body.traderId;
+	let invitation = await fetchBizUserMapping(businessId, traderId, BizUserRole.TRADER);
+	if (invitation && invitation.status === BizUserMappingStatus.ACTIVE) {
+		await removeBizTraderMapping(businessId, traderId);
+		res.send({
+			error: false
+		});
+	} else {
+		res.send({
+			error: true,
+			errorCode: "MAPPING_NOT_FOUND"
+		});
+	}
+});
+
+router.get("/:businessId/traders", async (req: Request, res: Response) => {
+	// TODO: authorize this operation. Only a business user can do this
+	const businessId = req.params.businessId;
+	const traderMappings = await fetchAllBizTraderMappings(businessId);
+	const invitationStatusMap = new Map<String, BizUserMappingStatus>();
+	traderMappings.map((m) => invitationStatusMap.set(m.userId, m.status));
+	const traderIds = traderMappings.map((m) => m.userId)
+	const traders = await genUsers(traderIds);
+	const results = traders.map((trader) => {
+		return {
+			...trader,
+			invitationStatus: invitationStatusMap.get(trader.id)
+		}
+	});
+	res.send({
+		error: false,
+		traders: results
+	})
 });
 
 export default router;

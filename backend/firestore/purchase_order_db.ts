@@ -43,8 +43,18 @@ export async function getPurchaseOrder(purchaseOrderId: string) {
 	return buildPurchaseOrderFromSnapshot(poSnapshot.id, poSnapshot.data());
 }
 
-export async function getPurchaseOrders(businessId: string) {
-	const poSnapshots = await getDocs(query(poColRef, where('businessId', '==', businessId)));
+export async function getPurchaseOrders(businessId?: string, traderId?: string, status?: POStatus) {
+	let q = query(poColRef);
+	if (businessId) {
+		q = query(q, where("businessId", "==", businessId));
+	}
+	if (traderId) {
+		q = query(q, where("traderId", "==", traderId));
+	}
+	if (status) {
+		q = query(q, where("status", "==", status));
+	}
+	const poSnapshots = await getDocs(q);
 	return poSnapshots.docs.map((poSnap) =>
 		buildPurchaseOrderFromSnapshot(poSnap.id, poSnap.data())
 	);
@@ -140,4 +150,27 @@ export async function updatePOItem(item: PurchaseOrderItem, updatedPOItemData: a
 		...updatedPOItemData,
 		updateTime: Date.now()
 	});
+}
+
+export async function getPOItems(poId?: string, businessId?: string, traderId?: string, partyId?: string, status?: POItemStatus) {
+	let q = query(poItemColRef);
+	if (poId) {
+		q = query(q, where("poId", "==", poId));
+	}
+	if (businessId) {
+		q = query(q, where("businessId", "==", businessId));
+	}
+	if (traderId) {
+		q = query(q, where("traderId", "==", traderId));
+	}
+	if (partyId) {
+		q = query(q, where("partyId", "==", partyId));
+	}
+	if (status) {
+		q = query(q, where("status", "==", status));
+	}
+	const itemSnapshots = await getDocs(q);
+	return itemSnapshots.docs.map((itemSnap) =>
+		buildPurchaseOrderItemFromSnapshot(itemSnap.id, itemSnap.data())
+	);
 }

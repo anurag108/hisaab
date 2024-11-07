@@ -16,7 +16,7 @@ curl -H 'Content-Type: application/json' -X POST localhost:8080/business -d '{ "
 curl -H 'Content-Type: application/json' -X POST localhost:8080/business/0WPwZoM10n1J0O7YFsLo -d '{ "name":"Anurag Enterprises Pvt. Ltd.", "gstNumber":"98792798982323"}'
 
 ## Fetch a business
-curl -H 'Content-Type: application/json' -X GET localhost:8080/business/0WPwZoM10n1J0O7YFsLo/
+localhost:8080/business/0WPwZoM10n1J0O7YFsLo/
 
 ## Invite Trader
 curl -H 'Content-Type: application/json' -X POST localhost:8080/business/invite/new -d '{ "businessId":"0WPwZoM10n1J0O7YFsLo", "email":"severus.snape987@gmail.com"}'
@@ -28,7 +28,7 @@ curl -H 'Content-Type: application/json' -X POST localhost:8080/business/invite/
 curl -H 'Content-Type: application/json' -X POST localhost:8080/business/deactivate/trader -d '{ "businessId":"0WPwZoM10n1J0O7YFsLo", "traderId": "zjuQr2dnOlsBWslmpjRo"}'
 
 ## Fetch all traders
-curl -H 'Content-Type: application/json' -X GET localhost:8080/business/0WPwZoM10n1J0O7YFsLo/traders
+localhost:8080/business/0WPwZoM10n1J0O7YFsLo/traders
 
 ========== TRADER ==========
 ## Respond to invitation
@@ -48,5 +48,8 @@ curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIX
 
 ========== PURCHASE_ORDERS ==========
 
-## Fetch POs
-curl -H 'Content-Type: application/json' -X GET localhost:8080/po
+## Fetch Orders
+localhost:8080/po?businessId=0WPwZoM10n1J0O7YFsLo
+
+## Fetch Order Items
+localhost:8080/po/X2BHrI2caszIXd5gUZlg/item?businessId=0WPwZoM10n1J0O7YFsLo

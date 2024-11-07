@@ -149,3 +149,17 @@ export async function fetchAllBizUserMappings(businessId: string, role?: BizUser
 	});
 	return mapping;
 }
+
+export async function genActiveBizForUser(userId: string) {
+	const q = query(colRef,
+		where("userId", "==", userId),
+		where("status", "==", BizUserMappingStatus.ACTIVE)
+	);
+	const snaps = await getDocs(q);
+	const bizMap = new Map<String, Object>();
+	snaps.forEach((snap) => {
+		const data = snap.data();
+		bizMap.set(data.businessId, { role: data.role });
+	});
+	return bizMap;
+}

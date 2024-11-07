@@ -5,6 +5,7 @@ import cors from "cors";
 import loginHandler from "./route_handlers/login_handler";
 import signupHandler from "./route_handlers/signup_handler";
 import bizHandler from "./route_handlers/business_handler";
+import bizUserHandler from "./route_handlers/biz_user_handler";
 import traderHandler from "./route_handlers/trader_handler";
 import poHandler from "./route_handlers/po_handler";
 import { User, UserStatus } from "./types";
@@ -54,6 +55,7 @@ app.use("/signup", signupHandler);
 app.use("/business", isUserLoggedIn, bizHandler);
 app.use("/trader", isUserLoggedIn, traderHandler);
 app.use("/po", isUserLoggedIn, poHandler);
+app.use("/user", isUserLoggedIn, bizUserHandler);
 
 app.use((req: Request, res: Response) => {
   res.status(404).send("Sorry can't find that!")

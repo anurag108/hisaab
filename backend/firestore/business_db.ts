@@ -3,9 +3,13 @@ import {
 	DocumentSnapshot,
 	DocumentData,
 	updateDoc,
+	getDocs,
+	where,
+	documentId,
+	query,
 } from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
-import { BusinessStatus } from "../types";
+import { Business, BusinessStatus } from "../types";
 
 const bizCollectionName = "business";
 const db = getFirestore(firebaseApp);
@@ -14,14 +18,14 @@ const colRef = collection(db, bizCollectionName);
 function makeBizFromSnapshot(bizSnapshot: DocumentSnapshot) {
 	const bizData = bizSnapshot.data() as DocumentData;
 	return {
-		id: bizSnapshot.id,
-		name: bizData.name,
-		address: bizData.address,
-		gstNumber: bizData.gstNumber,
-		pan: bizData.pan,
-		status: bizData.status,
-		creationTime: bizData.creationTime,
-		updateTime: bizData.updateTime,
+		id: bizSnapshot.id as string,
+		name: bizData.name as string,
+		address: bizData.address as string,
+		gstNumber: bizData.gstNumber as string,
+		pan: bizData.pan as string,
+		status: bizData.status as BusinessStatus,
+		creationTime: bizData.creationTime as number,
+		updateTime: bizData.updateTime as number,
 	}
 }
 
@@ -38,14 +42,15 @@ export async function createNewBusiness(
 	address: string,
 	gstNumber: string,
 	pan: string) {
+	const currTime = Date.now();
 	const bizData = {
 		name,
 		address,
 		gstNumber,
 		pan,
 		status: BusinessStatus.ACTIVE,
-		creationTime: Date.now(),
-		udpateTime: Date.now()
+		creationTime: currTime,
+		updateTime: currTime
 	};
 	const docRef = await addDoc(colRef, bizData);
 	return {
@@ -57,4 +62,11 @@ export async function createNewBusiness(
 export async function updateBusiness(businessId: string, bizData: any) {
 	const bizRef = doc(db, bizCollectionName, businessId);
 	await updateDoc(bizRef, bizData);
+}
+
+export async function genBizFromIds(ids: string[]) {
+	const bizSnaps = await getDocs(query(colRef, where(documentId(), "in", ids)));
+	const businesses: Business[] = [];
+	bizSnaps.forEach((snap) => businesses.push(makeBizFromSnapshot(snap)));
+	return businesses;
 }

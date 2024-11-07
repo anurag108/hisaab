@@ -31,21 +31,21 @@ app.use(session({
 
 function isUserLoggedIn(req: Request, res: Response, next: NextFunction) {
   req.session.user = {
-    id: "CIeubNg9SNPgbtnMYiEO",
-    name: "Anurag Gupta",
+    id: "zjuQr2dnOlsBWslmpjRo",
+    name: "Severus Snape",
     email: "severus.snape987@gmail.com",
     phone: {
       countryCode: "91",
       phoneNumber: "8130992702"
     },
     status: UserStatus.ACTIVE,
-    creationTime: 1730799542689,
-    updateTime: 1730799542689
+    creationTime: 1730880623290,
+    updateTime: 1730880623290
   };
   if (req.session.user) {
     next();
   } else {
-    res.status(403).send("UNAUTHORIZED");
+    res.status(403).send();
   }
 }
 

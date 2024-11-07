@@ -32,37 +32,21 @@ curl -H 'Content-Type: application/json' -X GET localhost:8080/business/0WPwZoM1
 
 ========== TRADER ==========
 ## Respond to invitation
-curl -H 'Content-Type: application/json' -X POST localhost:8080/trader/invitation -d '{ "invitationId": "<>", "decision":"<>"}'
+curl -H 'Content-Type: application/json' -X POST localhost:8080/trader/invitation -d '{ "invitationCipher": "88oQQM3OPHWtshaAD5ltJz3Klq4=", "decision":"ACCEPT"}'
 
 ## Create new Purchase Order
-curl -H 'Content-Type: application/json' -X POST localhost:8080/po -d '{}'
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po -d '{ "businessId": "0WPwZoM10n1J0O7YFsLo", "totalQuantity": 860, "rate": 2153, "contractDate": "2024-11-06", "deliveryDate": "2024-11-10"}'
 
 ## Update Purchase Order
-curl -H 'Content-Type: application/json' -X POST localhost:8080/po/:poId -d '{}'
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIXd5gUZlg -d '{"businessId": "0WPwZoM10n1J0O7YFsLo", "totalQuantity": 960, "rate": 2253, "contractDate": "2024-11-07", "deliveryDate": "2024-11-11"}'
 
 ## Create new Purchase Order items
-curl -H 'Content-Type: application/json' -X POST localhost:8080/po/item -d '{}'
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIXd5gUZlg/item -d '{"partyId":"rOfAb9nwAC6gP0RmU8M1", "vehicleNumber": "RJ87 87982", "quantity": 203}'
 
 ## Update Purchase Order item
-curl -H 'Content-Type: application/json' -X POST localhost:8080/po/:poId/item/:itemId -d '{}'
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIXd5gUZlg/item/7uC7zuEApw74dz77ZcgZ -d '{"vehicleNumber": "RJ87 4G5667", "quantity": 201.4}'
 
 ========== PURCHASE_ORDERS ==========
 
 ## Fetch POs
 curl -H 'Content-Type: application/json' -X GET localhost:8080/po
-
-curl -H 'Content-Type: application/json' -X POST localhost:8080/ZQO0zqKhEzwuqpE40U1p/po/new -d '{ "broker_id":"<RANDOM_BROKER_ID>","body":"bar", "id": 1}'
-
-
-curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr","name":"Ankit Tomar", "phoneNumber": "+919911123702", "email": "arvindkumarsharadkumar@gmail.com", "password": "Ankit@12"}'
-
-curl -H 'Content-Type: application/json' -X POST localhost:8080/broker -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr","name":"Anurag Gupta", "phoneNumber": "+918130992702", "email": "anurag.gupta108@gmail.com", "password": "Qwedsa@123"}'
-
-
-curl -H 'Content-Type: application/json' -X POST localhost:8080/party -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr", "brokerId":"CYcXCOHkgAwIr9wwCZG7", "name":"Arvind Gupta", "address": "16 Community Center, Lawrence Road, New Delhi - 110035", "pan": "ASXPG4332J", "gstNumber": "KJNOJA98769HJAKJ"}'
-
-
-curl -H 'Content-Type: application/json' -X POST localhost:8080/purchaseOrder -d '{ "businessId":"aBfJosYmhg7dsKOQ56lr", "brokerId":"CYcXCOHkgAwIr9wwCZG7", "totalQuantity": 800, "rate": 2830, "contractDate": 1727136000000, "deliveryDate": 1727395200000}'
-
-
-curl -H 'Content-Type: application/json' -X POST localhost:8080/purchaseOrderItems -d '{ "purchaseOrderId":"e25BCTUTMulcWfv3y413", "items": [{"vehicleNumber": "HR98 K8780", "quantity": 170, "billNumber": "76967", "partyId": "1j4sBGJbpwavSVxkYE0O"}, {"vehicleNumber": "RJ10 B8768", "quantity": 140, "billNumber": "75676", "partyId": "1j4sBGJbpwavSVxkYE0O"}]}'

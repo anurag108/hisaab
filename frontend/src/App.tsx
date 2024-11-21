@@ -4,7 +4,7 @@ import {
   ThemeProvider,
   createTheme,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import OrderManager from './orders/OrderManager.react';
 import TradersCrud from './trader/TradersCrud.react';
 import OrderItemsManager from './orders/OrderItemsManager.react';
@@ -12,7 +12,8 @@ import HisaabLogin from './login/HisaabLogin.react';
 import HisaabAppbar from './HisaabAppbar.react';
 import { indigo } from '@mui/material/colors';
 import { makePOSTCall } from './api';
-import { UserProvider } from './UserContext';
+import { AppContext } from './AppContext';
+import { User } from './types';
 
 const theme = createTheme({
   palette: {
@@ -23,29 +24,56 @@ const theme = createTheme({
 });
 
 function App() {
-  const [selectedTab, setSelectedTab] = useState('HOME');
+  const [user, setUser] = useState<User | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string>("");
+
+  const handleLogin = (loggedInUser: User) => {
+    localStorage.setItem("user", JSON.stringify(loggedInUser));
+    setUser(loggedInUser);
+
+    setSelectedTab("HOME");
+    // TODO: fetch all businesses for this user
+  }
+
+  const handleLogout = async () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    await makePOSTCall("/log/out", {});
+  };
+
   const handleTabClick = async (tabId: string) => {
-    setSelectedTab(tabId);
-    if (tabId === 'LOGOUT') {
-      localStorage.removeItem("user");
-      await makePOSTCall("/log/out", {});
+    if (tabId === "LOGOUT") {
+      await handleLogout();
+      setSelectedTab("");
+    } else {
+      setSelectedTab(tabId);
     }
   };
 
+  useEffect(() => {
+    const stringifiedUser = localStorage.getItem("user");
+    if (stringifiedUser) {
+      setUser(JSON.parse(stringifiedUser));
+      setSelectedTab("HOME");
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
-      <UserProvider>
-        <Box component="main">
-          <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
-          <Box sx={{ m: 1 }}>
-            {selectedTab === 'HOME' && <OrderItemsManager />}
-            {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
-            {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
-            {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
-            {selectedTab === 'LOGOUT' && <HisaabLogin onLogin={() => setSelectedTab('HOME')} />}
+      <AppContext.Provider value={{ user, handleLogin, handleLogout }}>
+        {user === null && <HisaabLogin onLogin={handleLogin} />}
+        {user !== null &&
+          <Box component="main">
+            <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
+            <Box sx={{ m: 1 }}>
+              {selectedTab === 'HOME' && <OrderItemsManager />}
+              {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
+              {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
+              {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
+            </Box>
           </Box>
-        </Box>
-      </UserProvider>
+        }
+      </AppContext.Provider>
     </ThemeProvider>
   );
 }

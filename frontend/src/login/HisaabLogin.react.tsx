@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, Stack, TextField, Typography } from "@mui/material";
+import { AppBar, Box, Button, Container, FormControl, Stack, TextField, Toolbar, Typography } from "@mui/material";
 import { useState } from "react";
 import { makePOSTCall } from "../api";
 import { User } from "../types";
@@ -68,71 +68,89 @@ export default function HisaabLogin(props: HisaabLoginProps) {
     }
 
     return (
-        <Box
-            component="form"
-            noValidate
-            autoComplete="off"
-            sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            {
-                view === 'LOGIN' &&
-                <Stack spacing={2} sx={{ width: 405 }}>
-                    <h1>Login</h1>
-                    <TextField
-                        id="email"
-                        label="Email"
-                        type="email"
-                        variant="outlined"
-                        value={email}
-                        onChange={onChangeEmailField}
-                        required
-                        fullWidth
-                        error={emailErrorMessage !== ''}
-                        helperText={emailErrorMessage !== '' && "Please enter a valid email"}
-                    />
-                    <TextField
-                        id="password"
-                        label="Password"
-                        type="password"
-                        variant="outlined"
-                        value={password}
-                        onChange={onChangePasswordField}
-                        required
-                        fullWidth
-                    />
-                    {loginErrorMessage !== "" && <Typography variant="body1" color="error">{loginErrorMessage}</Typography>}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        disabled={!isFormFilled}
-                        onClick={handleLogin}>
-                        Sign In
-                    </Button>
-                    {/* <Button variant="text" onClick={() => { setView('FORGOT_PASSWORD') }}>Forgot Password?</Button> */}
-                </Stack>
-            }
-            {
-                view === 'FORGOT_PASSWORD' &&
-                <Stack spacing={2} sx={{ width: 405 }}>
-                    <h1>Forgot Password</h1>
-                    <TextField
-                        id="email"
-                        label="Email"
-                        type="email"
-                        variant="outlined"
-                        required
-                        fullWidth
-                    />
-                    <Stack direction="row" spacing={1}>
-                        <Button variant="contained" color="primary" onClick={() => setView('LOGIN')}>Back to Login</Button>
-                        <Button variant="contained" color="primary" onClick={handleResetPassword}>Send Reset Password Link</Button>
+        <Box component="main">
+            <AppBar position="static">
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters sx={{ justifyContent: 'center' }}>
+                        <Typography
+                            variant="h4"
+                            sx={{
+                                color: 'inherit',
+                                textDecoration: 'none',
+                            }}
+                        >
+                            Hisaab
+                        </Typography>
+                    </Toolbar>
+                </Container>
+            </AppBar>
+            <Box
+                component="form"
+                noValidate
+                autoComplete="off"
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    mt: 5
+                }}
+            >
+                {
+                    view === 'LOGIN' &&
+                    <Stack spacing={2} sx={{ width: 405 }}>
+                        <h1>Login</h1>
+                        <TextField
+                            id="email"
+                            label="Email"
+                            type="email"
+                            variant="outlined"
+                            value={email}
+                            onChange={onChangeEmailField}
+                            required
+                            fullWidth
+                            error={emailErrorMessage !== ''}
+                            helperText={emailErrorMessage !== '' && "Please enter a valid email"}
+                        />
+                        <TextField
+                            id="password"
+                            label="Password"
+                            type="password"
+                            variant="outlined"
+                            value={password}
+                            onChange={onChangePasswordField}
+                            required
+                            fullWidth
+                        />
+                        {loginErrorMessage !== "" && <Typography variant="body1" color="error">{loginErrorMessage}</Typography>}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            disabled={!isFormFilled}
+                            onClick={handleLogin}>
+                            Sign In
+                        </Button>
+                        {/* <Button variant="text" onClick={() => { setView('FORGOT_PASSWORD') }}>Forgot Password?</Button> */}
                     </Stack>
-                </Stack>
-            }
+                }
+                {
+                    view === 'FORGOT_PASSWORD' &&
+                    <Stack spacing={2} sx={{ width: 405 }}>
+                        <h1>Forgot Password</h1>
+                        <TextField
+                            id="email"
+                            label="Email"
+                            type="email"
+                            variant="outlined"
+                            required
+                            fullWidth
+                        />
+                        <Stack direction="row" spacing={1}>
+                            <Button variant="contained" color="primary" onClick={() => setView('LOGIN')}>Back to Login</Button>
+                            <Button variant="contained" color="primary" onClick={handleResetPassword}>Send Reset Password Link</Button>
+                        </Stack>
+                    </Stack>
+                }
+            </Box>
         </Box>
     );
 }

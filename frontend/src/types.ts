@@ -8,6 +8,18 @@ export interface User {
     updateTime: string
 }
 
+export enum BizUserRole {
+    OWNER = "OWNER",
+    TRADER = "TRADER",
+}
+
+
+export interface BizData {
+    bizId: string,
+    bizName: string,
+    role: BizUserRole
+}
+
 export enum OrderStatus {
     PENDING_APPROVAL = "PENDING_APPROVAL",
     APPROVED = "APPROVED",

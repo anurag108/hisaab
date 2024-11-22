@@ -9,9 +9,14 @@ import {
     Avatar,
     Container,
     Tooltip,
+    InputLabel,
+    Select,
+    SelectChangeEvent,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { BizData } from "./types";
+import { makeGETCall } from "./api";
 
 const pages = [
     { id: 'HOME', label: 'Home' },
@@ -26,11 +31,14 @@ const settings = [
 
 interface HisaabAppbarProps {
     selectedTab: string,
-    handleTabClick: (tabId: string) => void
+    handleTabClick: (tabId: string) => void,
+    onSelectBiz: (bizData: BizData) => void
 }
 
 export default function HisaabAppbar(props: HisaabAppbarProps) {
-    const { selectedTab, handleTabClick } = props;
+    const { selectedTab, handleTabClick, onSelectBiz } = props;
+    const [selectedBiz, setSelectedBiz] = useState<BizData | null>(null);
+    const [businesses, setBusinesses] = useState<BizData[]>([]);
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -48,6 +56,32 @@ export default function HisaabAppbar(props: HisaabAppbarProps) {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+
+    const fetchBusinesses = async () => {
+        try {
+            const response = await makeGETCall("user/business");
+            if (response.ok) {
+                const data = await response.json();
+                if (data.error) {
+                    console.error(response);
+                    // TODO: Add error handling
+                } else {
+                    setBusinesses(data.bizData);
+                    // if (data.bizData && data.bizData.length > 0) {
+                    //     onSelectBiz(data.bizData[0]);
+                    // }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            // TODO: Add error handling
+            throw error;
+        }
+    };
+
+    useEffect(() => {
+        fetchBusinesses().catch(console.error);
+    }, []);
 
     return (
         <AppBar position="static">
@@ -76,6 +110,37 @@ export default function HisaabAppbar(props: HisaabAppbarProps) {
                             </MenuItem>
                         ))}
                     </Box>
+                    {businesses.length > 0 &&
+                        <Box sx={{ flexGrow: 1 }}>
+                            <Select
+                                labelId="demo-simple-select-autowidth-label"
+                                id="demo-simple-select-autowidth"
+                                value={selectedBiz?.bizId ?? "NONE"}
+                                // onChange={onChangeBiz}
+                                autoWidth
+                                label="Business"
+                                sx={{ border: 1, borderRadius: 1 }}
+                            >
+                                <MenuItem key={"NONE"} value="NONE">
+                                    <Typography sx={{ textAlign: 'center' }}>Select a business</Typography>
+                                </MenuItem>
+                                {businesses.map((biz) =>
+                                    <MenuItem
+                                        key={biz.bizId}
+                                        value={biz.bizId}
+                                        onClick={() => {
+                                            setSelectedBiz(biz);
+                                            onSelectBiz(biz);
+                                        }}>
+                                        <Typography
+                                            variant="h6"
+                                            sx={{ textAlign: 'center' }}>{biz.bizName}
+                                        </Typography>
+                                    </MenuItem>
+                                )}
+                            </Select>
+                        </Box>
+                    }
 
                     {/* for smaller screen */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

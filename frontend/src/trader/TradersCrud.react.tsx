@@ -112,7 +112,7 @@ export default function TradersCrud(props: TraderCrudProps) {
 
     useEffect(() => {
         fetchTraders().catch((error) => console.error(error));
-    }, []);
+    }, [props.businessId]);
 
     const handleInviteDialogClose = () => {
         setInviteDialogOpen(false);

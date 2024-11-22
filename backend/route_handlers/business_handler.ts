@@ -158,17 +158,24 @@ router.get("/:businessId/traders", async (req: Request, res: Response) => {
 	const invitationStatusMap = new Map<String, BizUserMappingStatus>();
 	traderMappings.map((m) => invitationStatusMap.set(m.userId, m.status));
 	const traderIds = traderMappings.map((m) => m.userId)
-	const traders = await genUsers(traderIds);
-	const results = traders.map((trader) => {
-		return {
-			...trader,
-			invitationStatus: invitationStatusMap.get(trader.id)
-		}
-	});
-	res.send({
-		error: false,
-		traders: results
-	})
+	if (traderIds.length > 0) {
+		const traders = await genUsers(traderIds);
+		const results = traders.map((trader) => {
+			return {
+				...trader,
+				invitationStatus: invitationStatusMap.get(trader.id)
+			}
+		});
+		res.send({
+			error: false,
+			traders: results
+		})
+	} else {
+		res.send({
+			error: false,
+			traders: []
+		})
+	}
 });
 
 export default router;

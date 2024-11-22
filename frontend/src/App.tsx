@@ -11,9 +11,9 @@ import OrderItemsManager from './orders/OrderItemsManager.react';
 import HisaabLogin from './login/HisaabLogin.react';
 import HisaabAppbar from './HisaabAppbar.react';
 import { indigo } from '@mui/material/colors';
-import { makePOSTCall } from './api';
+import { makeGETCall, makePOSTCall } from './api';
 import { AppContext } from './AppContext';
-import { User } from './types';
+import { BizData, User } from './types';
 
 const theme = createTheme({
   palette: {
@@ -24,21 +24,21 @@ const theme = createTheme({
 });
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string>("");
+  const stringifiedUser = localStorage.getItem("user");
+  const [user, setUser] = useState<User | null>(stringifiedUser ? JSON.parse(stringifiedUser) : null);
+  const [selectedBiz, setSelectedBiz] = useState<BizData | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string>(stringifiedUser ? "HOME" : "");
 
-  const handleLogin = (loggedInUser: User) => {
+  const handleLogin = async (loggedInUser: User) => {
     localStorage.setItem("user", JSON.stringify(loggedInUser));
     setUser(loggedInUser);
-
     setSelectedTab("HOME");
-    // TODO: fetch all businesses for this user
   }
 
   const handleLogout = async () => {
     localStorage.removeItem("user");
     setUser(null);
-    await makePOSTCall("/log/out", {});
+    await makePOSTCall("log/out", {});
   };
 
   const handleTabClick = async (tabId: string) => {
@@ -50,13 +50,9 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    const stringifiedUser = localStorage.getItem("user");
-    if (stringifiedUser) {
-      setUser(JSON.parse(stringifiedUser));
-      setSelectedTab("HOME");
-    }
-  }, []);
+  const handleBizSelection = (selectedBiz: BizData) => {
+    setSelectedBiz(selectedBiz);
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -64,13 +60,22 @@ function App() {
         {user === null && <HisaabLogin onLogin={handleLogin} />}
         {user !== null &&
           <Box component="main">
-            <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
-            <Box sx={{ m: 1 }}>
-              {selectedTab === 'HOME' && <OrderItemsManager businessId="0WPwZoM10n1J0O7YFsLo" />}
-              {selectedTab === 'MANAGE_ORDERS' && <OrderManager businessId="0WPwZoM10n1J0O7YFsLo" />}
-              {selectedTab === 'MANAGE_TRADERS' && <TradersCrud businessId="0WPwZoM10n1J0O7YFsLo" />}
-              {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
-            </Box>
+            <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} onSelectBiz={handleBizSelection} />
+            {!selectedBiz && <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mt: 5
+            }}>
+              Please select a business to continue
+            </Box>}
+            {selectedBiz &&
+              <Box sx={{ m: 1 }}>
+                {selectedTab === 'HOME' && <OrderItemsManager businessId={selectedBiz.bizId} />}
+                {selectedTab === 'MANAGE_ORDERS' && <OrderManager businessId={selectedBiz.bizId} />}
+                {selectedTab === 'MANAGE_TRADERS' && <TradersCrud businessId={selectedBiz.bizId} />}
+                {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}
+              </Box>}
           </Box>
         }
       </AppContext.Provider>

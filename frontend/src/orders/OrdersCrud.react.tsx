@@ -99,7 +99,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
 
     useEffect(() => {
         fetchPurchaseOrders().catch(console.error);
-    }, []);
+    }, [props.businessId]);
 
     const columns: GridColDef[] = [
         {

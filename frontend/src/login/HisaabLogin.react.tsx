@@ -23,7 +23,7 @@ export default function HisaabLogin(props: HisaabLoginProps) {
         } else {
             try {
                 const response = await makePOSTCall(
-                    '/log/in', {
+                    'log/in', {
                     email,
                     password
                 });

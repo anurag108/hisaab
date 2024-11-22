@@ -92,7 +92,7 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
 
     useEffect(() => {
         fetchPurchaseOrderItems().catch(console.error);
-    }, []);
+    }, [props.businessId]);
 
     const baseColumnOptions = {
         hideable: true,

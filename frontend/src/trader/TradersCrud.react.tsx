@@ -20,9 +20,10 @@ import {
     GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import AddIcon from '@mui/icons-material/Add';
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import InviteTrader from "./InviteTrader.react";
-import mockTraders from '../data/traders.json';
+import { makeGETCall, makePOSTCall } from "../api";
+import { Trader } from "../types";
 
 interface InviteToolbarProps {
     handleInviteDialogClick: () => Promise<void>
@@ -82,10 +83,36 @@ function DeactivationConfirmationModal(props: DeactivationConfirmationModalProps
     );
 };
 
-export default function TradersCrud() {
-    const [traders, setTraders] = useState(mockTraders);
+interface TraderCrudProps {
+    businessId: string,
+}
+
+export default function TradersCrud(props: TraderCrudProps) {
+    const [traders, setTraders] = useState<Trader[]>([]);
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
     const [deactivationRow, setDeactivationRow] = useState<GridRowId | null>(null);
+
+    const fetchTraders = async () => {
+        try {
+            const response = await makeGETCall("business/" + props.businessId + "/traders");
+            if (response.ok) {
+                const data = await response.json();
+                if (data.error) {
+                    // TODO: Add error handling
+                    console.error(data);
+                } else {
+                    setTraders(data.traders);
+                }
+            }
+        } catch (error) {
+            // TODO: Add error handling
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        fetchTraders().catch((error) => console.error(error));
+    }, []);
 
     const handleInviteDialogClose = () => {
         setInviteDialogOpen(false);
@@ -110,7 +137,12 @@ export default function TradersCrud() {
     }
 
     const handleDeactivation = async () => {
-        // TODO: call deactivation API
+        await makePOSTCall("business/deactivate/trader", {
+            businessId: props.businessId,
+            traderId: deactivationRow
+        });
+        // TODO: Add error handling
+
         const updatedTraders = traders.map((trader) => {
             if (trader.id === deactivationRow) {
                 trader.status = 'DEACTIVATED';
@@ -189,35 +221,38 @@ export default function TradersCrud() {
             flex: 1.5,
             ...baseColumnOptions,
             renderCell: (params: GridRenderCellParams) => {
-                const onDeactivateClick = (event: MouseEvent<HTMLElement>) => {
+                const onDeactivateClick = async (event: MouseEvent<HTMLElement>) => {
                     event.stopPropagation();
                     setDeactivationRow(params.id);
                 };
-                const onReactivateClick = (event: MouseEvent<HTMLElement>) => {
-                    // TODO: call reactivate api
-                    const updatedTraders = traders.map((trader) => {
-                        if (trader.id === params.id) {
-                            trader.status = 'ACTIVE';
-                        }
-                        return trader;
-                    });
-                    setTraders(updatedTraders);
-                };
+
+                // const onReactivateClick = async (event: MouseEvent<HTMLElement>) => {
+                //     // TODO: call reactivate api
+                //     const updatedTraders = traders.map((trader) => {
+                //         if (trader.id === params.id) {
+                //             trader.status = 'ACTIVE';
+                //         }
+                //         return trader;
+                //     });
+                //     setTraders(updatedTraders);
+                // };
 
                 const onCancelInviteClick = async () => {
-                    // TODO: Call API
+                    await makePOSTCall("business/invite/cancel", {
+                        businessId: props.businessId,
+                        traderId: params.id
+                    });
+                    // TODO: Add error handling
+
                     const updatedTraders = traders.filter((trader) => trader.id !== params.id);
                     setTraders(updatedTraders);
                 };
 
                 const status = params.row.status;
-                if (status === 'DEACTIVATED') {
-                    return (<Button variant="contained" color="primary" onClick={onReactivateClick}>Reactivate</Button>);
+                if (status === 'ACTIVE') {
+                    return (<Button variant="contained" color="error" onClick={onDeactivateClick}>Deactivate</Button>);
                 } else if (status === 'INVITED') {
                     return (<Button variant="contained" color="primary" onClick={onCancelInviteClick}>Cancel Invite</Button>);
-                }
-                else {
-                    return (<Button variant="contained" color="error" onClick={onDeactivateClick}>Deactivate</Button>);
                 }
             },
         },

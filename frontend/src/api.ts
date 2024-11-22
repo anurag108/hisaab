@@ -22,7 +22,7 @@ export async function makePOSTCall(path: string, reqBody: any) {
     }
 }
 
-export async function makeGETCall(path: string, params: GetParams[]) {
+export async function makeGETCall(path: string, params: GetParams[] = []) {
     const urlParams = params.map((param) => param.name + "=" + param.value);
     const url = endpoint + "/" + path + "?" + urlParams;
     try {

@@ -1,5 +1,5 @@
 import { Box, Chip, Grid2 } from "@mui/material";
-import { ExpandedOrderItem } from "../types";
+import { Order, OrderItem } from "../types";
 import {
     DataGrid,
     GridActionsCellItem,
@@ -20,10 +20,11 @@ import {
     GridToolbarQuickFilter,
     MuiEvent
 } from "@mui/x-data-grid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
+import { makeGETCall } from "../api";
 
 function DataToolbar() {
     return (
@@ -49,17 +50,43 @@ function DataToolbar() {
     );
 }
 
-const VISIBLE_COLUMNS = ['traderId', 'orderId', 'quantity', 'gateEntryNumber', 'vehicleNumber', 'deliveryDate', 'status', 'billNumber', 'claim'];
-
 interface OrderItemsCrudProps {
-    initialItems: GridRowsProp,
-    onOrderClick: (orderItem: ExpandedOrderItem) => Promise<void>
+    businessId: string,
+    onOrderClick: (order: Order) => Promise<void>
 }
 
 export default function OrderItemsCrud(props: OrderItemsCrudProps) {
-    const { initialItems, onOrderClick } = props;
-    const [items, setItems] = useState(initialItems);
+    const { businessId, onOrderClick } = props;
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [items, setItems] = useState<GridRowsProp>([]);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+
+    const fetchPurchaseOrderItems = async () => {
+        const response = await makeGETCall("po/items/all", [{
+            name: "businessId",
+            value: businessId
+        }]);
+        if (response.ok) {
+            const data = await response.json();
+            if (!data.error) {
+                setOrders(data.expandedOrderItems);
+                let allOrderItems: OrderItem[] = [];
+                data.expandedOrderItems.map((order: Order) => {
+                    allOrderItems = allOrderItems.concat(order.items);
+                });
+                setItems(allOrderItems);
+            }
+            // TODO: Add error handling
+        } else {
+            // TODO: Add error handling
+            console.log("Response not OK", response);
+        }
+        return [];
+    };
+
+    useEffect(() => {
+        fetchPurchaseOrderItems().catch(console.error);
+    }, []);
 
     const baseColumnOptions = {
         hideable: true,
@@ -104,13 +131,6 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
 
     const columns: GridColDef[] = [
         {
-            field: 'id',
-            headerName: 'Order Item ID',
-            ...baseColumnOptions,
-            filterable: false,
-            editable: false,
-        },
-        {
             field: 'deliveryDate',
             headerName: 'Delivery Date',
             ...baseColumnOptions,
@@ -118,14 +138,14 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             editable: true,
         },
         {
-            field: 'traderId',
-            headerName: 'Trader ID',
+            field: 'id',
+            headerName: 'Order Item ID',
             ...baseColumnOptions,
-            flex: 1,
+            filterable: false,
             editable: false,
         },
         {
-            field: 'orderId',
+            field: 'poId',
             headerName: 'Order ID',
             ...baseColumnOptions,
             filterable: false,
@@ -137,6 +157,13 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             headerName: 'Business ID',
             ...baseColumnOptions,
             filterable: false,
+            flex: 1,
+            editable: false,
+        },
+        {
+            field: 'traderId',
+            headerName: 'Trader ID',
+            ...baseColumnOptions,
             flex: 1,
             editable: false,
         },
@@ -233,6 +260,46 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             editable: true,
         },
         {
+            field: 'cd2',
+            headerName: 'CD2',
+            type: 'number',
+            headerAlign: 'left',
+            align: 'left',
+            ...baseColumnOptions,
+            flex: 0.7,
+            editable: true,
+        },
+        {
+            field: 'bardana',
+            headerName: 'Bardana ',
+            type: 'number',
+            headerAlign: 'left',
+            align: 'left',
+            ...baseColumnOptions,
+            flex: 0.7,
+            editable: true,
+        },
+        {
+            field: 'fumigation',
+            headerName: 'Fumigation',
+            type: 'number',
+            headerAlign: 'left',
+            align: 'left',
+            ...baseColumnOptions,
+            flex: 0.7,
+            editable: true,
+        },
+        {
+            field: 'commission',
+            headerName: 'Commission',
+            type: 'number',
+            headerAlign: 'left',
+            align: 'left',
+            ...baseColumnOptions,
+            flex: 0.7,
+            editable: true,
+        },
+        {
             field: 'netWeight',
             headerName: 'Net Weight (Qntl)',
             ...baseColumnOptions,
@@ -288,8 +355,10 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
     ];
 
     const handleRowClick = async (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
-        const order = params.row;
-        await onOrderClick(order);
+        const clickedOrder = orders.find((order) => order.id === params.row.poId);
+        if (clickedOrder) {
+            await onOrderClick(clickedOrder);
+        }
     };
 
     return (
@@ -333,6 +402,7 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
                 columns={columns}
                 columnVisibilityModel={{
                     id: false,
+                    poId: false,
                     businessId: false,
                     creationTime: false,
                     updateTime: false,

@@ -66,7 +66,7 @@ function App() {
           <Box component="main">
             <HisaabAppbar selectedTab={selectedTab} handleTabClick={handleTabClick} />
             <Box sx={{ m: 1 }}>
-              {selectedTab === 'HOME' && <OrderItemsManager />}
+              {selectedTab === 'HOME' && <OrderItemsManager businessId="0WPwZoM10n1J0O7YFsLo" />}
               {selectedTab === 'MANAGE_ORDERS' && <OrderManager />}
               {selectedTab === 'MANAGE_TRADERS' && <TradersCrud />}
               {selectedTab === 'MANAGE_ACCOUNT' && <p>Account management coming soon</p>}

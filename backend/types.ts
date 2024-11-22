@@ -97,8 +97,17 @@ export type PurchaseOrderItem = {
     traderId: string;
     partyId: string;
     quantity: number;
+    deliveredQuantity?: number,
     vehicleNumber: string;
-    billNumber?: string;
+    gateEntryNumber?: string,
+    billNumber?: string,
+    claim?: number,
+    bardana?: number,
+    fumigation?: number,
+    cd2?: number,
+    commission?: number,
+    otherDeductions?: number,
+    deliveryDate?: string,
     status: POItemStatus;
     creationTime: number;
     updateTime: number;

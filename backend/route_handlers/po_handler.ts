@@ -26,7 +26,7 @@ router.get("/", async (req: Request, res: Response) => {
     const businessId = req.query.businessId as string;
     const traderId = req.query.traderId as string;
     const status = req.query.status as POStatus;
-    const orders = await getPurchaseOrders(businessId, traderId, status);
+    const orders = await getPurchaseOrders(new Set<string>(), businessId, traderId, status);
     res.send({
         error: false,
         orders
@@ -175,6 +175,32 @@ router.get("/:poId/item", async (req: Request, res: Response) => {
         error: false,
         items
     });
+});
+
+router.get("/items/all", async (req: Request, res: Response) => {
+    const businessId = req.query.businessId as string;
+    const orderItems = await getPOItems(undefined, businessId, undefined, undefined, undefined);
+
+    if (orderItems.length > 0) {
+        const orderIds = new Set(orderItems.map((orderItem) => orderItem.poId));
+        const orders = await getPurchaseOrders(orderIds);
+
+        const expandedOrderItems = orders.map((order) => {
+            return {
+                ...order,
+                items: orderItems.filter((orderItem) => orderItem.poId === order.id)
+            }
+        });
+        res.send({
+            error: false,
+            expandedOrderItems
+        });
+    } else {
+        res.send({
+            error: false,
+            expandedOrderItems: []
+        });
+    }
 });
 
 export default router;

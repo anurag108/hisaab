@@ -60,10 +60,10 @@ export interface OrderItem {
 
 export interface ExpandedOrderItem {
     id: string,
+    poId: string,
     businessId: string,
     traderId: string,
     partyId: string,
-    orderId: string,
     quantity: number,
     deliveredQuantity: number,
     vehicleNumber: string,

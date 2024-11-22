@@ -1,4 +1,4 @@
-import { Grid2 as Grid, Stack, Box, styled, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
+import { Grid2 as Grid, Stack, Box, styled, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Button } from "@mui/material";
 import { ExpandedOrderItem, Order, OrderItem } from "../types";
 import OrderItemsCrud from "./OrderItemsCrud.react";
 
@@ -154,10 +154,10 @@ export default function OrderItemDetails(props: OrderItemDetailsProps) {
     const expandedItems = order.items.map((item) => {
         return {
             id: item.id,
+            poId: order.id,
             businessId: order.businessId,
             traderId: order.traderId,
             partyId: item.partyId,
-            orderId: order.id,
             quantity: item.quantity,
             deliveredQuantity: item.deliveredQuantity,
             vehicleNumber: item.vehicleNumber,
@@ -180,7 +180,7 @@ export default function OrderItemDetails(props: OrderItemDetailsProps) {
     return (
         <Stack spacing={2}>
             <OrderSummary order={props.order} />
-            <OrderItemsCrud initialItems={props.order.items} onOrderClick={async () => { }} />
+            <OrderItemsCrud businessId={props.order.businessId} onOrderClick={async () => { }} />
             <OrderTotals order={props.order} />
             <Footer />
         </Stack>

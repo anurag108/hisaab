@@ -8,7 +8,8 @@ import {
 	where,
 	query,
 	updateDoc,
-	DocumentData
+	DocumentData,
+	documentId
 } from "firebase/firestore";
 import { firebaseApp } from "./firebase_client";
 import { POItemStatus, POStatus, PurchaseOrder, PurchaseOrderItem } from "../types";
@@ -43,8 +44,11 @@ export async function getPurchaseOrder(purchaseOrderId: string) {
 	return buildPurchaseOrderFromSnapshot(poSnapshot.id, poSnapshot.data());
 }
 
-export async function getPurchaseOrders(businessId?: string, traderId?: string, status?: POStatus) {
+export async function getPurchaseOrders(ids: Set<string>, businessId?: string, traderId?: string, status?: POStatus) {
 	let q = query(poColRef);
+	if (ids.size > 0) {
+		q = query(q, where(documentId(), "in", Array.from(ids)));
+	}
 	if (businessId) {
 		q = query(q, where("businessId", "==", businessId));
 	}
@@ -105,7 +109,17 @@ function buildPurchaseOrderItemFromSnapshot(id: string, itemData: DocumentData) 
 		partyId: itemData.partyId as string,
 		status: itemData.status as POItemStatus,
 		quantity: itemData.quantity as number,
+		deliveredQuantity: itemData.deliveredQuantity as number,
 		vehicleNumber: itemData.vehicleNumber as string,
+		gateEntryNumber: itemData.gateEntryNumber as string,
+		billNumber: itemData.billNumber as string,
+		claim: itemData.claim as number,
+		bardana: itemData.bardana as number,
+		fumigation: itemData.fumigation as number,
+		cd2: itemData.cd2 as number,
+		commission: itemData.commission as number,
+		otherDeductions: itemData.otherDeductions as number,
+		deliveryDate: itemData.deliveryDate as string,
 		creationTime: itemData.creationTime as number,
 		updateTime: itemData.updateTime as number
 	};

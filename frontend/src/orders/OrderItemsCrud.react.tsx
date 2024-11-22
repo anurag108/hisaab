@@ -1,4 +1,4 @@
-import { Box, Chip, Grid2 } from "@mui/material";
+import { Alert, AlertProps, Box, Chip, Grid2, Snackbar } from "@mui/material";
 import { Order, OrderItem } from "../types";
 import {
     DataGrid,
@@ -20,11 +20,11 @@ import {
     GridToolbarQuickFilter,
     MuiEvent
 } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import { makeGETCall } from "../api";
+import { makeGETCall, makePOSTCall } from "../api";
 
 function DataToolbar() {
     return (
@@ -60,6 +60,12 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [items, setItems] = useState<GridRowsProp>([]);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+    const [snackbar, setSnackbar] = useState<Pick<
+        AlertProps,
+        'children' | 'severity'
+    > | null>(null);
+
+    const handleCloseSnackbar = () => setSnackbar(null);
 
     const fetchPurchaseOrderItems = async () => {
         const response = await makeGETCall("po/items/all", [{
@@ -119,10 +125,45 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
         }
     };
 
-    const processRowUpdate = (newRow: GridRowModel) => {
+    const saveOrderItem = async (newRow: GridRowModel) => {
+        try {
+            const response = await makePOSTCall("po/" + newRow.poId + "/item/" + newRow.id, {
+                deliveryDate: newRow.deliveryDate,
+                partyId: newRow.partyId,
+                quantity: newRow.quantity,
+                deliveredQuantity: newRow.deliveredQuantity,
+                vehicleNumber: newRow.vehicleNumber,
+                gateEntryNumber: newRow.gateEntryNumber,
+                billNumber: newRow.billNumber,
+                status: newRow.status,
+                claim: newRow.claim,
+                bardana: newRow.bardana,
+                fumigation: newRow.fumigation,
+                commission: newRow.commission,
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.error) {
+                    // TODO: Add error handling
+                }
+            } else {
+                // TODO: Add error handling
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    const processRowUpdate = async (newRow: GridRowModel) => {
         const updatedRow = { ...newRow, isNew: false };
+        await saveOrderItem(newRow);
         setItems(items.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;
+    };
+
+    const handleRowUpdateFailure = (error: Error) => {
+        setSnackbar({ children: error.message, severity: 'error' });
     };
 
     const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
@@ -399,6 +440,7 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
+                onProcessRowUpdateError={handleRowUpdateFailure}
                 columns={columns}
                 columnVisibilityModel={{
                     id: false,
@@ -426,6 +468,16 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
                     toolbar: DataToolbar,
                 }}
             />
+            {!!snackbar && (
+                <Snackbar
+                    open
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    onClose={handleCloseSnackbar}
+                    autoHideDuration={6000}
+                >
+                    <Alert {...snackbar} onClose={handleCloseSnackbar} />
+                </Snackbar>
+            )}
         </Box >
     );
 }

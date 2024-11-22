@@ -128,24 +128,22 @@ router.post("/:poId/item/:itemId", async (req: Request, res: Response) => {
         });
         return;
     }
-    let updatedItemData = item;
-    if (req.body.partyId) {
-        updatedItemData.partyId = req.body.partyId;
-    }
-    if (req.body.vehicleNumber) {
-        updatedItemData.vehicleNumber = req.body.vehicleNumber;
-    }
-    if (req.body.quantity) {
-        updatedItemData.quantity = req.body.quantity;
-    }
-    const newStatus = req.body.status;
-    if (newStatus && newStatus === POItemStatus.CANCELLED) {
-        updatedItemData.status = req.body.status;
-    }
-    updatedItemData.updateTime = Date.now();
     await updatePOItem(
         item,
-        updatedItemData);
+        {
+            partyId: req.body.partyId ?? item.partyId ?? null,
+            deliveryDate: req.body.deliveryDate ?? item.deliveryDate ?? null,
+            deliveredQuantity: req.body.deliveredQuantity ?? item.deliveredQuantity ?? null,
+            vehicleNumber: req.body.vehicleNumber ?? item.vehicleNumber ?? null,
+            gateEntryNumber: req.body.gateEntryNumber ?? item.gateEntryNumber ?? null,
+            billNumber: req.body.billNumber ?? item.billNumber ?? null,
+            claim: req.body.claim ?? item.claim ?? null,
+            bardana: req.body.bardana ?? item.bardana ?? null,
+            fumigation: req.body.fumigation ?? item.fumigation ?? null,
+            commission: req.body.commission ?? item.commission ?? null,
+            status: req.body.status ?? item.status,
+            updateTime: Date.now(),
+        });
     res.send({
         error: false,
     });

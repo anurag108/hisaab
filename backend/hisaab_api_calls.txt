@@ -44,7 +44,7 @@ curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIX
 curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIXd5gUZlg/item -d '{"partyId":"rOfAb9nwAC6gP0RmU8M1", "vehicleNumber": "RJ87 87982", "quantity": 203}'
 
 ## Update Purchase Order item
-curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIXd5gUZlg/item/7uC7zuEApw74dz77ZcgZ -d '{"vehicleNumber": "RJ87 4G5667", "quantity": 201.4}'
+curl -H 'Content-Type: application/json' -X POST localhost:8080/po/X2BHrI2caszIXd5gUZlg/item/7uC7zuEApw74dz77ZcgZ -d '{"deliveryDate":"2024-11-22"}'
 
 ========== PURCHASE_ORDERS ==========
 

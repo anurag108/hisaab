@@ -145,8 +145,16 @@ export async function createNewPOItem(
 		businessId: purchaseOrder.businessId,
 		traderId: purchaseOrder.traderId,
 		partyId: partyId,
+		deliveryDate: null,
 		vehicleNumber: vehicleNumber,
+		gateEntryNumber: null,
 		quantity: quantity,
+		deliveredQuantity: null,
+		billNumber: null,
+		claim: null,
+		bardana: null,
+		fumigation: null,
+		commission: null,
 		status: POItemStatus.PENDING_APPROVAL,
 		creationTime: currTime,
 		updateTime: currTime,
@@ -161,8 +169,7 @@ export async function createNewPOItem(
 export async function updatePOItem(item: PurchaseOrderItem, updatedPOItemData: any) {
 	const poRef = doc(db, poItemColName, item.id);
 	await updateDoc(poRef, {
-		...updatedPOItemData,
-		updateTime: Date.now()
+		...updatedPOItemData
 	});
 }
 

@@ -6,7 +6,7 @@ interface GetParams {
 }
 
 export async function makePOSTCall(path: string, reqBody: any) {
-    const url = endpoint + path;
+    const url = endpoint + "/" + path;
     try {
         return await fetch(url, {
             method: "POST",

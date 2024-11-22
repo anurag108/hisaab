@@ -69,13 +69,13 @@ router.post("/:poId", async (req: Request, res: Response) => {
     }
     const businessId = req.body.businessId;
     // TODO: check that user is an active trader for the business
-    const mapping = await fetchBizUserMapping(businessId, user.id);
-    if (!mapping
-        || mapping.role !== BizUserRole.TRADER
-        || mapping.status !== BizUserMappingStatus.ACTIVE) {
-        res.send(403).send();
-        return;
-    }
+    // const mapping = await fetchBizUserMapping(businessId, user.id);
+    // if (!mapping
+    //     || mapping.role !== BizUserRole.TRADER
+    //     || mapping.status !== BizUserMappingStatus.ACTIVE) {
+    //     res.send(403).send();
+    //     return;
+    // }
     const purchaseOrder = await getPurchaseOrder(req.params.poId);
     if (!purchaseOrder) {
         res.send({
@@ -85,10 +85,11 @@ router.post("/:poId", async (req: Request, res: Response) => {
         return;
     }
     const updatedPOData = {
-        totalQuantity: req.body.totalQuantity ?? purchaseOrder.totalQuantity,
-        rate: req.body.rate ?? purchaseOrder.rate,
-        contractDate: req.body.contractDate ?? purchaseOrder.contractDate,
-        deliveryDate: req.body.deliveryDate ?? purchaseOrder.deliveryDate
+        totalQuantity: req.body.totalQuantity ?? purchaseOrder.totalQuantity ?? null,
+        rate: req.body.rate ?? purchaseOrder.rate ?? null,
+        contractDate: req.body.contractDate ?? purchaseOrder.contractDate ?? null,
+        deliveryDate: req.body.deliveryDate ?? purchaseOrder.deliveryDate ?? null,
+        status: req.body.status ?? purchaseOrder.status
     };
     const updatedPurchaseOrder = await updatePurchaseOrder(
         purchaseOrder,
@@ -121,7 +122,9 @@ router.post("/:poId/item", async (req: Request, res: Response) => {
 
 router.post("/:poId/item/:itemId", async (req: Request, res: Response) => {
     const item = await getPurchaseOrderItem(req.params.itemId);
-    if (!item || item.status !== POItemStatus.PENDING_APPROVAL) {
+    if (!item
+        // || item.status !== POItemStatus.PENDING_APPROVAL
+    ) {
         res.send({
             error: true,
             errorCode: "PURCHASE_ORDER_ITEM_NOT_FOUND"

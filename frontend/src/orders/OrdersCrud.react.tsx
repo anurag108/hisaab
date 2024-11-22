@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import {
-    GridRowsProp,
     DataGrid,
     GridColDef,
     GridToolbarContainer,
@@ -14,10 +13,12 @@ import {
     GridCallbackDetails,
     MuiEvent,
 } from '@mui/x-data-grid';
-import { Order } from '../types';
+import { Order, OrderStatus } from '../types';
 import { Chip, Grid2 } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { makeGETCall, makePOSTCall } from '../api';
 
 function DataToolbar() {
     return (
@@ -44,19 +45,61 @@ function DataToolbar() {
 }
 
 interface OrdersCrudProps {
-    initialOrders: GridRowsProp,
+    businessId: string,
     onOrderClick: (order: Order) => Promise<void>
 }
 
-const VISIBLE_COLUMNS = ['traderId', 'totalQuantity', 'rate', 'contractDate', 'deliveryDate', 'status'];
-
 export default function OrdersCrud(props: OrdersCrudProps) {
-    const [orders, setOrders] = useState(props.initialOrders);
+    const [orders, setOrders] = useState<Order[]>([]);
     const baseColumnOptions = {
         hideable: true,
         pinnable: false,
         editable: false,
     }
+
+    const fetchPurchaseOrders = async () => {
+        const response = await makeGETCall("po/items/all", [{
+            name: "businessId",
+            value: props.businessId
+        }]);
+        if (response.ok) {
+            const data = await response.json();
+            if (!data.error) {
+                setOrders(data.expandedOrderItems);
+            }
+            // TODO: Add error handling
+        } else {
+            // TODO: Add error handling
+            console.log("Response not OK", response);
+        }
+        return [];
+    };
+
+    const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
+        try {
+            const response = await makePOSTCall("po/" + orderId, {
+                status,
+                businessId: props.businessId
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.error) {
+                    // TODO: Add error handling
+                    console.log(response);
+                }
+            } else {
+                // TODO: Add error handling
+                console.log(response);
+            }
+        } catch (error) {
+            // TODO: Add error handling
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        fetchPurchaseOrders().catch(console.error);
+    }, []);
 
     const columns: GridColDef[] = [
         {
@@ -156,9 +199,10 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                 const approveAction = (
                     <GridActionsCellItem
                         label='Approve'
-                        icon={<DoneIcon />}
+                        icon={<ThumbUpIcon color='success' />}
                         onClick={async () => {
-                            // TODO: Call API
+                            await updateOrderStatus(params.row.id, OrderStatus.APPROVED);
+
                             // set status & update view
                             const updatedOrders = orders.map((order) => {
                                 if (order.id === params.row.id) {
@@ -174,9 +218,10 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                 const rejectAction = (
                     <GridActionsCellItem
                         label='Reject'
-                        icon={<CancelIcon />}
+                        icon={<CancelIcon color='error' />}
                         onClick={async () => {
-                            // TODO: Call API
+                            await updateOrderStatus(params.row.id, OrderStatus.REJECTED);
+
                             // set status & update view
                             const updatedOrders = orders.map((order) => {
                                 if (order.id === params.row.id) {
@@ -191,10 +236,11 @@ export default function OrdersCrud(props: OrdersCrudProps) {
 
                 const completeAction = (
                     <GridActionsCellItem
-                        label='Completed'
-                        icon={<CancelIcon />}
+                        label='Mark Completed'
+                        icon={<DoneIcon color='success' />}
                         onClick={async () => {
-                            // TODO: Call API
+                            await updateOrderStatus(params.row.id, OrderStatus.COMPLETED);
+
                             // set status & update view
                             const updatedOrders = orders.map((order) => {
                                 if (order.id === params.row.id) {

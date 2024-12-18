@@ -45,7 +45,7 @@ function buildInviteFromSnapshot(invitationId: string, inviteData: DocumentData)
 		id: invitationId,
 		businessId: inviteData.businessId as string,
 		userId: inviteData.userId as string,
-		role: inviteData.role as string,
+		role: inviteData.role as BizUserRole,
 		status: inviteData.status as BizUserMappingStatus,
 		creationTime: inviteData.creatimeTime as number,
 		updateTime: inviteData.updateTime as number

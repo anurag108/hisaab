@@ -17,6 +17,7 @@ import {
 } from "../firestore/business_user_db";
 import { createPartialUser, genUserByEmail, genUsers } from "../firestore/user_db";
 import { BizUserMappingStatus, BizUserRole } from "../types";
+import { sendEmail, sendTraderInvitationEmail } from "../mail_handler/mailer";
 
 router.get("/:businessId", async (req: Request, res: Response) => {
 	const biz = await getBusiness(req.params.businessId);
@@ -85,38 +86,42 @@ router.post("/invite/new", async (req: Request, res: Response) => {
 		});
 	} else {
 		let invitation = await fetchBizUserMapping(businessId, user.id);
-		if (!invitation) {
-			invitation = await createNewTraderInvitation(businessId, user.id);
+		if (invitation) {
+			// console.log("No invitation found");
+			// invitation = await createNewTraderInvitation(businessId, user.id);
+			// console.log("created invitation");
 			// TODO: send email to trader
+			await sendTraderInvitationEmail(email, invitation);
 			res.send({
 				error: false,
 			})
-		} else {
-			if (invitation.role === BizUserRole.OWNER) {
-				res.send({
-					error: true,
-					errorCode: "OWNER_CANNOT_BE_INVITED"
-				});
-			} else if (invitation.status === BizUserMappingStatus.INVITE_REJECTED
-				|| invitation.status === BizUserMappingStatus.DEACTIVATED
-			) {
-				res.send({
-					error: true,
-					errorCode: "USER_CANNOT_BE_INVITED"
-				});
-			} else if (invitation.status === BizUserMappingStatus.ACTIVE || invitation.status === BizUserMappingStatus.INVITED) {
-				res.send({
-					error: true,
-					errorCode: "USER_ALREADY_ACTIVE_OR_INVITED"
-				});
-			} else if (invitation.status === BizUserMappingStatus.INVITE_CANCELLED) {
-				await updateTraderInvitationStatus(invitation.id, BizUserMappingStatus.INVITED);
-				// TODO: send another email
-				res.send({
-					error: false
-				});
-			}
 		}
+		// else {
+		// 	if (invitation.role === BizUserRole.OWNER) {
+		// 		res.send({
+		// 			error: true,
+		// 			errorCode: "OWNER_CANNOT_BE_INVITED"
+		// 		});
+		// 	} else if (invitation.status === BizUserMappingStatus.INVITE_REJECTED
+		// 		|| invitation.status === BizUserMappingStatus.DEACTIVATED
+		// 	) {
+		// 		res.send({
+		// 			error: true,
+		// 			errorCode: "USER_CANNOT_BE_INVITED"
+		// 		});
+		// 	} else if (invitation.status === BizUserMappingStatus.ACTIVE || invitation.status === BizUserMappingStatus.INVITED) {
+		// 		res.send({
+		// 			error: true,
+		// 			errorCode: "USER_ALREADY_ACTIVE_OR_INVITED"
+		// 		});
+		// 	} else if (invitation.status === BizUserMappingStatus.INVITE_CANCELLED) {
+		// 		await updateTraderInvitationStatus(invitation.id, BizUserMappingStatus.INVITED);
+		// 		// TODO: send another email
+		// 		res.send({
+		// 			error: false
+		// 		});
+		// 	}
+		// }
 	}
 });
 

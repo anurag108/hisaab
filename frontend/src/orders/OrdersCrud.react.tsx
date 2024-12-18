@@ -14,35 +14,13 @@ import {
     MuiEvent,
 } from '@mui/x-data-grid';
 import { Order, OrderStatus } from '../types';
-import { Chip, Grid2 } from '@mui/material';
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2, Modal, TextField } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { makeGETCall, makePOSTCall } from '../api';
-
-function DataToolbar() {
-    return (
-        <GridToolbarContainer sx={{ mb: 2 }}>
-            <Grid2 container width={'100%'}>
-                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                    <GridToolbarFilterButton slotProps={{
-                        tooltip: { title: 'Filter purchase orders' },
-                        button: { variant: 'contained', size: 'medium' }
-                    }} />
-                </Grid2>
-                <Grid2 size={'grow'}>
-                    <GridToolbarQuickFilter />
-                </Grid2>
-                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <GridToolbarExport slotProps={{
-                        tooltip: { title: 'Export purchase orders' },
-                        button: { variant: 'contained', size: 'medium' }
-                    }} />
-                </Grid2>
-            </Grid2>
-        </GridToolbarContainer>
-    );
-}
+import NewOrder from './NewOrder.react';
+import { Business } from '@mui/icons-material';
 
 interface OrdersCrudProps {
     businessId: string,
@@ -50,11 +28,49 @@ interface OrdersCrudProps {
 }
 
 export default function OrdersCrud(props: OrdersCrudProps) {
+    const { businessId, onOrderClick } = props;
     const [orders, setOrders] = useState<Order[]>([]);
+    const [openNewOrderModal, setOpenNewOrderModal] = useState(false);
+
     const baseColumnOptions = {
         hideable: true,
         pinnable: false,
         editable: false,
+    }
+
+    const handleOrderCreation = (order: Order) => {
+        setOrders(orders.concat(order));
+    };
+
+    const handleDialogClose = () => {
+        setOpenNewOrderModal(false);
+    }
+
+    function DataToolbar() {
+        return (
+            <GridToolbarContainer sx={{ mb: 2 }}>
+                <Grid2 container width={'100%'}>
+                    <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <Button variant="contained" onClick={() => { setOpenNewOrderModal(true) }}>New Purchase Order</Button>
+                    </Grid2>
+                    <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <GridToolbarFilterButton slotProps={{
+                            tooltip: { title: 'Filter purchase orders' },
+                            button: { variant: 'contained', size: 'medium' }
+                        }} />
+                    </Grid2>
+                    <Grid2 size={'grow'}>
+                        <GridToolbarQuickFilter />
+                    </Grid2>
+                    <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <GridToolbarExport slotProps={{
+                            tooltip: { title: 'Export purchase orders' },
+                            button: { variant: 'contained', size: 'medium' }
+                        }} />
+                    </Grid2>
+                </Grid2>
+            </GridToolbarContainer>
+        );
     }
 
     const fetchPurchaseOrders = async () => {
@@ -270,8 +286,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
     ];
 
     const handleRowClick = async (params: GridRowParams, event: MuiEvent<React.MouseEvent>, details: GridCallbackDetails) => {
-        const order = params.row;
-        await props.onOrderClick(order);
+        await onOrderClick(params.row);
     };
 
     return (
@@ -309,7 +324,6 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                 getRowHeight={() => 'auto'}
                 columns={columns}
                 columnVisibilityModel={{
-                    id: false,
                     businessId: false,
                     creationTime: false,
                     updateTime: false,
@@ -333,6 +347,7 @@ export default function OrdersCrud(props: OrdersCrudProps) {
                     toolbar: DataToolbar,
                 }}
             />
+            <NewOrder open={openNewOrderModal} businessId={businessId} handleDialogClose={handleDialogClose} handleOrderCreation={handleOrderCreation}></NewOrder>
         </Box >
     );
 }

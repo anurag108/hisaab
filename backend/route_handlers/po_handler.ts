@@ -110,6 +110,7 @@ router.post("/:poId/item", async (req: Request, res: Response) => {
         });
         return;
     }
+    console.log("Creating new Order Item");
     const item = await createNewPOItem(purchaseOrder,
         req.body.partyId,
         req.body.vehicleNumber,

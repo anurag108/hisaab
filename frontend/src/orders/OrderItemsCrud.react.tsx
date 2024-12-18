@@ -1,4 +1,4 @@
-import { Alert, AlertProps, Box, Chip, Grid2, Snackbar } from "@mui/material";
+import { Alert, AlertProps, Box, Button, Chip, Grid2, Snackbar } from "@mui/material";
 import { Order, OrderItem } from "../types";
 import {
     DataGrid,
@@ -21,34 +21,12 @@ import {
     MuiEvent
 } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import { makeGETCall, makePOSTCall } from "../api";
-
-function DataToolbar() {
-    return (
-        <GridToolbarContainer sx={{ mb: 2 }}>
-            <Grid2 container width={'100%'}>
-                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                    <GridToolbarFilterButton slotProps={{
-                        tooltip: { title: 'Filter purchase order items' },
-                        button: { variant: 'contained', size: 'medium' }
-                    }} />
-                </Grid2>
-                <Grid2 size={'grow'}>
-                    <GridToolbarQuickFilter />
-                </Grid2>
-                <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <GridToolbarExport slotProps={{
-                        tooltip: { title: 'Export purchase order items' },
-                        button: { variant: 'contained', size: 'medium' }
-                    }} />
-                </Grid2>
-            </Grid2>
-        </GridToolbarContainer>
-    );
-}
+import { randomId } from "@mui/x-data-grid-generator";
 
 interface OrderItemsCrudProps {
     businessId: string,
@@ -64,6 +42,67 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
         AlertProps,
         'children' | 'severity'
     > | null>(null);
+
+    const handleNewOrderItem = () => {
+        const id = "NEW-" + randomId();
+        setItems((oldRows) => [
+            ...oldRows,
+            {
+                id: id,
+                deliveryDate: '',
+                poId: '',
+                businessId: businessId,
+                traderId: '',
+                partyId: '',
+                status: 'PENDING_APPROVAL',
+                creationTime: Date.now(),
+                updateTime: Date.now(),
+                quantity: 0.0,
+                deliveredQuantity: 0.0,
+                gateEntryNumber: '',
+                vehicleNumber: '',
+                billNumber: '',
+                claim: 0.0,
+                cd2: 0.0,
+                bardana: 0.0,
+                fumigation: 0.0,
+                commission: 0.0,
+                netWeight: 0.0,
+                isNew: true
+            },
+        ]);
+        setRowModesModel((oldModel) => ({
+            ...oldModel,
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'poId' },
+        }));
+    };
+
+    function DataToolbar() {
+        return (
+            <GridToolbarContainer sx={{ mb: 2 }}>
+                <Grid2 container width={'100%'}>
+                    <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={handleNewOrderItem}>New Vehicle Dispatch</Button>
+                    </Grid2>
+                    <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                        <GridToolbarFilterButton slotProps={{
+                            tooltip: { title: 'Filter purchase order items' },
+                            button: { variant: 'contained', size: 'medium' }
+                        }} />
+                    </Grid2>
+                    <Grid2 size={'grow'}>
+                        <GridToolbarQuickFilter />
+                    </Grid2>
+                    <Grid2 size={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <GridToolbarExport slotProps={{
+                            tooltip: { title: 'Export purchase order items' },
+                            button: { variant: 'contained', size: 'medium' }
+                        }} />
+                    </Grid2>
+                </Grid2>
+            </GridToolbarContainer>
+        );
+    }
 
     const handleCloseSnackbar = () => setSnackbar(null);
 
@@ -155,11 +194,56 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
         }
     }
 
+    const createNewOrderItem = async (newRow: GridRowModel) => {
+        try {
+            const response = await makePOSTCall("po/" + newRow.poId + "/item/", {
+                deliveryDate: newRow.deliveryDate,
+                partyId: newRow.partyId,
+                quantity: newRow.quantity,
+                deliveredQuantity: newRow.deliveredQuantity,
+                vehicleNumber: newRow.vehicleNumber,
+                gateEntryNumber: newRow.gateEntryNumber,
+                billNumber: newRow.billNumber,
+                status: newRow.status,
+                claim: newRow.claim,
+                bardana: newRow.bardana,
+                fumigation: newRow.fumigation,
+                commission: newRow.commission,
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.error) {
+                    // TODO: Add error handling
+                }
+                return data.item;
+            } else {
+                // TODO: Add error handling
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
+
     const processRowUpdate = async (newRow: GridRowModel) => {
-        const updatedRow = { ...newRow, isNew: false };
-        await saveOrderItem(newRow);
-        setItems(items.map((row) => (row.id === newRow.id ? updatedRow : row)));
-        return updatedRow;
+        if (newRow.id.startsWith("NEW-")) {
+            console.log("NewRow", newRow);
+            const tempRowId = newRow.id;
+            const orderItem = await createNewOrderItem(newRow);
+            console.log("Created new item in DB", orderItem);
+            newRow.id = orderItem.id;
+            const updatedRow = {
+                ...newRow,
+                isNew: true,
+            };
+            setItems(items.map((row) => (row.id === tempRowId ? updatedRow : row)));
+            return updatedRow;
+        } else {
+            const updatedRow = { ...newRow, isNew: false };
+            await saveOrderItem(newRow);
+            setItems(items.map((row) => (row.id === newRow.id ? updatedRow : row)));
+            return updatedRow;
+        }
     };
 
     const handleRowUpdateFailure = (error: Error) => {
@@ -191,7 +275,7 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             ...baseColumnOptions,
             filterable: false,
             flex: 1,
-            editable: false,
+            editable: true,
         },
         {
             field: 'businessId',
@@ -206,7 +290,14 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             headerName: 'Trader ID',
             ...baseColumnOptions,
             flex: 1,
-            editable: false,
+            editable: true,
+        },
+        {
+            field: 'partyId',
+            headerName: 'Party ID',
+            ...baseColumnOptions,
+            flex: 1,
+            editable: true,
         },
         {
             field: 'quantity',
@@ -216,7 +307,7 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
             align: 'left',
             ...baseColumnOptions,
             flex: 0.6,
-            editable: false,
+            editable: true,
         },
         {
             field: 'deliveredQuantity',
@@ -444,7 +535,6 @@ export default function OrderItemsCrud(props: OrderItemsCrudProps) {
                 columns={columns}
                 columnVisibilityModel={{
                     id: false,
-                    poId: false,
                     businessId: false,
                     creationTime: false,
                     updateTime: false,
